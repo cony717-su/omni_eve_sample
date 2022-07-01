@@ -4,5 +4,6 @@ using UnityEngine;
 
 public class GameManager : IManager<GameManager>
 {
-
+    public string serverName;
+    public string nickname;
 }
