@@ -16,7 +16,23 @@ MonoBehaviour:
   m_Data:
     m_SerializedData: []
   m_GUID: 6c96b33cd67bccf48b056fd13f5951e0
-  m_SerializeEntries: []
+  m_SerializeEntries:
+  - m_GUID: 2cda990e2423bbf4892e6590ba056729
+    m_Address: SceneTitle
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: a7a15ee0eb69bd540b7fdcd494d49cf2
+    m_Address: SceneLobby
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 421cf6f8d52ad2c4b97f37e5b11eaf1b
+    m_Address: SceneGame
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 007075d92f1f30645bc3b44788803ccf
+    m_Address: SceneLoader
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 8e2cd4983dffac84ebf8357c0ce5089d, type: 2}
   m_SchemaSet:

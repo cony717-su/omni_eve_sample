@@ -23,6 +23,12 @@ public class IManager<T> : MonoBehaviour where T : Component
 
     protected virtual void Awake()
     {
-        _instance = this as T;
+        if(_instance is null)
+        {
+            _instance = this as T;
+            DontDestroyOnLoad(gameObject);
+            return;
+        }
+        Destroy(gameObject);
     }
 }
