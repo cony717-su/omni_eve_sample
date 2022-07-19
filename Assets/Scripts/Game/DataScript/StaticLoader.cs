@@ -7,6 +7,6 @@ public class StaticLoader : MonoBehaviour
 {
     private void Start()
     {
-        // connect
+        gameObject.AddComponent<DBStaticLoader>();
     }
 }
