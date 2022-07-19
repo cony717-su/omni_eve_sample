@@ -3,10 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SceneTitle : IScene
+public class StaticLoader : MonoBehaviour
 {
     private void Start()
     {
-        StaticManager.Instance.Load();
+        gameObject.AddComponent<DBStaticLoader>();
     }
 }

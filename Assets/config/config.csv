@@ -1,0 +1,9 @@
+#dbProfileName,mainDbHost,gameDbHost,mainDbName,gameDbName,IS_QA,serverUrl,dbID
+dev,kr.dc.dev.shiftup.co.kr:3306,kr.dc.dev.shiftup.co.kr:3306,dc_dev,dc_dev_game,0,kr.dc.dev.shiftup.co.kr/dev,shiftup
+dev(orgo),pub.kr.dc.dev.shiftup.co.kr:13306,pub.kr.dc.dev.shiftup.co.kr:13306,dc_dev,dc_dev_game,0,kr.dc.dev.shiftup.co.kr/dev,shiftup
+QA,qa-dc-aurora-201221-cluster.cluster-cemp27ztg5cn.ap-northeast-2.rds.amazonaws.com:3306,qa-dc-aurora-201221-cluster.cluster-cemp27ztg5cn.ap-northeast-2.rds.amazonaws.com:3306,dc_main,dc_game,0,qa-dc.nextfloor.com/GameServer,dc
+CERT,qa-dc-aurora-201221-cluster.cluster-cemp27ztg5cn.ap-northeast-2.rds.amazonaws.com:3306,qa-dc-aurora-201221-cluster.cluster-cemp27ztg5cn.ap-northeast-2.rds.amazonaws.com:3306,dc_main_cert,dc_game_cert,0,qa-dc.nextfloor.com/GameServer,dc
+dev_program,kr.dc.dev.shiftup.co.kr:3306,kr.dc.dev.shiftup.co.kr:3306,dev_program,dev_program_game,0,kr.dc.dev.shiftup.co.kr/dev_program,shiftup
+qa_ads,qa-ads-dckr-aurora-20210819-cluster.cluster-cemp27ztg5cn.ap-northeast-2.rds.amazonaws.com:3306,qa-ads-dckr-aurora-20210819-cluster.cluster-cemp27ztg5cn.ap-northeast-2.rds.amazonaws.com:3306,dc_main,dc_game,0,gs.qa-ads.dckr.shiftupcorp.com/GameServer,dc
+dev_puppet,kr.dc.dev.shiftup.co.kr:3306,kr.dc.dev.shiftup.co.kr:3306,dc_puppet,dc_puppet_game,0,kr.dc.dev.shiftup.co.kr/dev_puppet,shiftup
+dev_ads_kr,kr.dc.dev.shiftup.co.kr:3306,kr.dc.dev.shiftup.co.kr:3306,dc_dev_ads,dc_dev_ads_game,0,kr.dc.dev.shiftup.co.kr/dev_ads_kr,shiftup
