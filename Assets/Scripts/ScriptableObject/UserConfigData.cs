@@ -10,6 +10,7 @@ public class UserConfigData : IScriptableObject
 {
     public string serverName;
     public string nickName;
+    public string bin;
 }
 
 [CustomEditor(typeof(UserConfigData))]
