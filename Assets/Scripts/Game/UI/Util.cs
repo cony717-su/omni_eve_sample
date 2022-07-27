@@ -21,10 +21,9 @@ namespace Util
     
     public class Util
     {
-        public string GetLocaleText(string key)
+        public static string GetLocaleText(string key)
         {
-            string str = "";
-            return str;
+            return LocaleManager.GetLocale(key);
         }
 
         enum TextLoadingState

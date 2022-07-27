@@ -9,7 +9,17 @@ using Util;
 public class LocaleManager: IManager<GameManager>
 {
     private static Dictionary<string, string> LocaleDictionary { set; get; }
-    
+
+    public static string GetLocale(string key)
+    {
+        if (!LocaleDictionary.ContainsKey(key))
+        {
+            DebugManager.Log($"Invalid GetLocaleText key: {key}");
+            return key;
+        }
+
+        return LocaleDictionary[key];
+    }
     public static void LoadLocale(string fileName)
     {
         LocaleDictionary = new Dictionary<string, string>();
