@@ -8,6 +8,13 @@ using UnityEngine.ResourceManagement.ResourceProviders;
 
 public class ResourcesManager: IManager<GameManager>
 {
+    private static Dictionary<string, AsyncOperationHandle> handleDictionary;
+
+    void Start()
+    {
+        handleDictionary = new Dictionary<string, AsyncOperationHandle>();
+    }
+
     public static void LoadAddressableAsset<T>(string assetName, UnityAction<T> callback)
     {
         Addressables.LoadAssetAsync<T>(assetName).Completed += obj =>
@@ -18,7 +25,41 @@ public class ResourcesManager: IManager<GameManager>
                 return;
             }
 
+            handleDictionary.Add(assetName, obj);
             callback(obj.Result);
+        };
+    }
+
+    public static void OnDestroy(string objName)
+    {
+        if (!handleDictionary.ContainsKey(objName))
+        {
+            DebugManager.LogError($"Failed to destroy asset at address: {objName}");
+            return;
+        }
+
+        var handle = handleDictionary[objName];
+        Addressables.Release(handle);
+    }
+
+    public static void InstantiateAssetAsync(string assetName, Transform parent = null, 
+        bool instantiateInWorldSpace = false, bool trackHandle = true, 
+        UnityAction<GameObject> callback = null)
+    {
+        Addressables.InstantiateAsync(assetName, parent, instantiateInWorldSpace, 
+            trackHandle).Completed += (obj) =>
+        {
+            if (obj.Status != AsyncOperationStatus.Succeeded)
+            {
+                DebugManager.LogError($"Failed to instantiate asset at address: {assetName}");
+                return;
+            }
+
+            handleDictionary.Add(assetName, obj);
+            if (callback != null)
+            {
+                callback(obj.Result);
+            }
         };
     }
 }
