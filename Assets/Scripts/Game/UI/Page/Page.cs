@@ -32,6 +32,7 @@ public class Page : MonoBehaviour
     
     public void Show()
     {
+        transform.position = new Vector3(540.0f, 960.0f, 0.0f); 
         this.gameObject.SetActive(true);
         OnShow();
     }
