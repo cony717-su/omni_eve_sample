@@ -55,7 +55,11 @@ public class ResourcesManager: IManager<GameManager>
                 return;
             }
 
-            handleDictionary.Add(assetName, obj);
+            if (!handleDictionary.ContainsKey(assetName))
+            {
+                handleDictionary.Add(assetName, obj);
+            }
+
             if (callback != null)
             {
                 callback(obj.Result);
