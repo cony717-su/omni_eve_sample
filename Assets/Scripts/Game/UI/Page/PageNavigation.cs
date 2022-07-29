@@ -56,7 +56,7 @@ public class PageNavigation
             _prevPage = null;
         }
 
-        _currPage.Show();
+        _currPage.gameObject.SetActive(true);
         return _currPage;
     }
 
