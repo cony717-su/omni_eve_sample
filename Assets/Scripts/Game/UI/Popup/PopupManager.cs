@@ -1,43 +1,110 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class PopupManager : IManager<PopupManager>
 {
     private Queue<Popup> _queuePopup;
-    private static Transform parent;
+    private Popup _currentPopup;
+    private static Transform _parent;
+    private int _loadPopupCount;
+    private bool _isLoadedAll;
 
     void Start()
     {
         _queuePopup = new Queue<Popup>();
-        parent = GameObject.Find("PopupCanvas").transform;
+        _parent = GameObject.Find("PopupCanvas").transform;
+        Clear();
+    }
+    
+    public void Show(string popupName, params object[] obj)
+    {
+        ResourcesManager.InstantiateAssetAsync(popupName, _parent,
+            true, true,
+            (result) =>
+            {
+                Popup popup = result.GetComponent<Popup>();
+                popup.Setup(obj);
+                popup.Show();
+            });
     }
 
-    public void AddPopup(string popupName)
+    // queue popup functions
+    public void AddPopupList(List<string> popupList)
     {
-        ResourcesManager.InstantiateAssetAsync(popupName, parent,
+        if (popupList.Count <= 0)
+        {
+            DebugManager.Log("PopupList is empty.");
+            return;
+        }
+        
+        _loadPopupCount = popupList.Count;
+
+        foreach (string popupName in popupList)
+        {
+            AddPopup(popupName);
+        }
+    }
+    private void AddPopup (string popupName)
+    {
+        ResourcesManager.InstantiateAssetAsync(popupName, _parent,
             true, true,
             (result) =>
             {
                 Popup popup = result.GetComponent<Popup>();
                 _queuePopup.Enqueue(popup);
+                popup.gameObject.SetActive(false);
+                OnPopupLoaded();
             });
     }
 
-    public void Show(string popupName)
+    private void OnPopupLoaded()
     {
-        // 필요한 초기화 과정을 걸어준 다음에
-        // 그 팝업의 show를 걸면서 동시에 리턴
-        ResourcesManager.InstantiateAssetAsync(popupName, parent,
-            true, true,
-            (result) =>
-            {
-                Popup popup = result.GetComponent<Popup>();
-                popup.Show();
-            });
+        --_loadPopupCount;
+
+        if (_loadPopupCount <= 0)
+        {
+            _isLoadedAll = true;
+        }
+
+        if (_isLoadedAll)
+        {
+            Run();
+        }
     }
 
+    public void Clear()
+    {
+        _queuePopup.Clear();
+        _currentPopup = null;
+        _loadPopupCount = 0;
+        _isLoadedAll = false;
+    }
+
+    private void Run()
+    {
+        if (_queuePopup.Count <= 0)
+        {
+            DebugManager.Log("Queue popup is empty.");
+            return;
+        }
+        
+        _currentPopup = _queuePopup.Dequeue();
+        _currentPopup.Show();
+    }
+    
     public void Pop()
     {
+        _currentPopup.Hide();
+        
+        if (_queuePopup.Count <= 0)
+        {
+            return;
+        }
+        
+        Popup newPopup = _queuePopup.Dequeue();
+        _currentPopup = newPopup;
+        _currentPopup.Show();
     }
 }
