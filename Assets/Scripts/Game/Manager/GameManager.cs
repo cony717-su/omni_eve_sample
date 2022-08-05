@@ -9,10 +9,12 @@ public class GameManager : IManager<GameManager>
 {
     public string serverName;
     public string nickName;
+
     
     void Start()
     {
         DebugManager.Log();
+        
     }
     void Init()
     {

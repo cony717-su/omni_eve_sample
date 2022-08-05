@@ -4,5 +4,5 @@ using UnityEngine;
 
 public class SceneLobby : IScene
 {
-
+    protected override void OnInit() { }
 }
