@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Tilemap
+  m_EditorClassIdentifier: 
+  m_GroupName: Tilemap
+  m_Data:
+    m_SerializedData: []
+  m_GUID: c864d51c183c48547a3da233471684a4
+  m_SerializeEntries:
+  - m_GUID: b98f30772ad82574bab083b9cb49e56b
+    m_Address: Assets/AddressableResources/Tilemap/Tile_01/F0000000_01.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 43a47c2f52ac8e9498912d33ab595d47
+    m_Address: Assets/AddressableResources/Tilemap/AlasTile_01.spriteatlas
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 71720df4efbfbe446ad453fea895c07f
+    m_Address: Assets/AddressableResources/Tilemap/Tile_01/F0000000.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 8e2cd4983dffac84ebf8357c0ce5089d, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 24899e5eb4a51a74aba87c67557ec976, type: 2}
+    - {fileID: 11400000, guid: 931a40319cb56924ebba71763d587215, type: 2}
