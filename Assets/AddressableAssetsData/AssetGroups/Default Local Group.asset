@@ -33,6 +33,23 @@ MonoBehaviour:
     m_Address: SceneLoader
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 1b36a150f2e8b1c4d96a18f73569553b
+    m_Address: Assets/AddressableResources/Tilemap/Tile_01/Tile_F0000000.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 825e1f1e17ea9b248b7dd17b81636360
+    m_Address: Assets/AddressableResources/Tilemap/InitGrid.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - InitGrid
+  - m_GUID: a368f2b1e374c3c498bae85d035233f9
+    m_Address: Assets/AddressableResources/Tilemap/Tile_Floor.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 20f550b19aaff594ba5f482f1c33f611
+    m_Address: Assets/AddressableResources/Tilemap/Tile_Wall.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 8e2cd4983dffac84ebf8357c0ce5089d, type: 2}
   m_SchemaSet:

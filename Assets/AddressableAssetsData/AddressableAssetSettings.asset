@@ -85,6 +85,7 @@ MonoBehaviour:
   m_LabelTable:
     m_LabelNames:
     - default
+    - InitGrid
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: 3a19b07e613bb70428601124ed743a81, type: 2}

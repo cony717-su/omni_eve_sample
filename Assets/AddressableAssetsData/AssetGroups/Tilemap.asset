@@ -17,16 +17,8 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: c864d51c183c48547a3da233471684a4
   m_SerializeEntries:
-  - m_GUID: b98f30772ad82574bab083b9cb49e56b
-    m_Address: Assets/AddressableResources/Tilemap/Tile_01/F0000000_01.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
   - m_GUID: 43a47c2f52ac8e9498912d33ab595d47
     m_Address: Assets/AddressableResources/Tilemap/AlasTile_01.spriteatlas
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 71720df4efbfbe446ad453fea895c07f
-    m_Address: Assets/AddressableResources/Tilemap/Tile_01/F0000000.png
     m_ReadOnly: 0
     m_SerializedLabels: []
   m_ReadOnly: 0
