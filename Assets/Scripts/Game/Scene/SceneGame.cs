@@ -7,13 +7,16 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 public class SceneGame : IScene
 {
     GameObject _grid;
-
-    protected override void OnInit() { }
+    protected override void OnInit()
+    {
+        StaticManager.Instance.Init();
+    }
 
     private void Start()
     {
+        Init();
         // Init Grid for a Tilemap
-        ResourcesManager.Instance.InstantiateAsyncFromLabel("InitGrid", OnInitGrid);
+        // ResourcesManager.Instance.InstantiateAsyncFromLabel("InitGrid", OnInitGrid);
     }
 
 

@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using Shiftup.CommonLib.Data.Attributes;
 using InnerDevToolCommon.Attributes;
+using InnerDevToolCommon.Common;
 using InnerDevToolCommon.Data;
 
 using UnityEngine;
@@ -40,6 +41,12 @@ public class IScriptableObject : ScriptableObject
         inst._FileName = fileName;
         inst.Load(fileName);
         return inst;
+    }
+
+    public T Get<T>(params object[] args) where T : RowData
+    {
+        InnerTable<T> dataTable = (InnerTable<T>)GetType().GetProperty("_DataTable").GetValue(this);
+        return dataTable.Get(args);
     }
 
     public void LoadTable()

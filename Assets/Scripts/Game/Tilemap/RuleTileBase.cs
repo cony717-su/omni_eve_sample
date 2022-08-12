@@ -58,6 +58,8 @@ public class RuleTileBase : RuleTile<RuleTileBase.Neighbor> {
 public class RuleTileBaseEditor : RuleTileEditor
 {
     private ReorderableList.AddDropdownCallbackDelegate _onAddDropdownCallback;
+
+    private int selectedIndex = 1;
     
     private RuleTileBase Tile
     {
@@ -95,28 +97,6 @@ public class RuleTileBaseEditor : RuleTileEditor
     
     public override void SpriteOnGUI(Rect rect, RuleTile.TilingRuleOutput tilingRule)
     {
-        // todo
-        var subAssets = new List<Object>();
-        subAssets.Add(null);
-        var assetPath = Tile.SpriteAtlasAddress;
-
-        var repr = AssetDatabase.LoadAllAssetRepresentationsAtPath(assetPath);
-        if (repr.Any())
-        {
-            var subtype = GetGenericTypeFromAssetReference(Tile.spriteAtlas);
-            if (subtype != null)
-                repr = repr.Where(o => subtype.IsInstanceOfType(o)).OrderBy(s => s.name).ToArray();
-        }
-        
-        var mainType = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
-        if (mainType == typeof(SpriteAtlas))
-        {
-            var atlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(assetPath);
-            var sprites = new Sprite[atlas.spriteCount];
-            atlas.GetSprites(sprites);
-            subAssets.AddRange(sprites.OrderBy(s => s.name));
-        }
-
         tilingRule.m_Sprites[0] = EditorGUI.ObjectField(rect, tilingRule.m_Sprites[0], typeof(Sprite), false) as Sprite;
     }
     
@@ -166,6 +146,36 @@ public class RuleTileBaseEditor : RuleTileEditor
         base.OnInspectorGUI();
         serializedObject.ApplyModifiedProperties();
 
+        
+        // todo
+        var subAssets = new List<Object>();
+        subAssets.Add(null);
+        var assetPath = Tile.SpriteAtlasAddress;
+
+        var repr = AssetDatabase.LoadAllAssetRepresentationsAtPath(assetPath);
+        if (repr.Any())
+        {
+            var subtype = GetGenericTypeFromAssetReference(Tile.spriteAtlas);
+            if (subtype != null)
+                repr = repr.Where(o => subtype.IsInstanceOfType(o)).OrderBy(s => s.name).ToArray();
+        }
+        
+        var mainType = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
+        if (mainType == typeof(SpriteAtlas))
+        {
+            var atlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(assetPath);
+            var sprites = new Sprite[atlas.spriteCount];
+            atlas.GetSprites(sprites);
+            subAssets.AddRange(sprites.OrderBy(s => s.name));
+        }
+        
+
+
+        //selectedIndex = EditorGUILayout.Popup(selectedIndex, subAssets.ToArray());
+        //EditorGUILayout.ObjectField(Style.mainAssetLabel, currentMainSpriteLibraryAsset, typeof(SpriteLibraryAsset), false) as SpriteLibraryAsset;
+        //EditorGUILayout.IntField(intProperty.displayName, intProperty.intValue);
+        
+        
         if (GUILayout.Button("Load"))
         {
 

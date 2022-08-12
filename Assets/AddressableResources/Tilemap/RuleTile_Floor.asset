@@ -12,44 +12,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf50a092f86a0e84496bac696d20353e, type: 3}
   m_Name: RuleTile_Floor
   m_EditorClassIdentifier: 
-  m_DefaultSprite: {fileID: 0}
+  m_DefaultSprite: {fileID: 21300000, guid: 1b36a150f2e8b1c4d96a18f73569553b, type: 3}
   m_DefaultGameObject: {fileID: 3564303540673009166, guid: a368f2b1e374c3c498bae85d035233f9, type: 3}
   m_DefaultColliderType: 1
   m_TilingRules:
   - m_Id: 1
     m_Sprites:
-    - {fileID: 21300000, guid: 54441fa5f881c5e43b7c2dafdcd44d3f, type: 3}
+    - {fileID: 21300000, guid: e6b402abd1caaa2439ba88509bb99f54, type: 3}
+    - {fileID: 21300000, guid: 2ee892064dd53114193cbd30927a4c15, type: 3}
     m_GameObject: {fileID: 0}
     m_MinAnimationSpeed: 1
     m_MaxAnimationSpeed: 1
     m_PerlinScale: 0.5
-    m_Output: 0
-    m_ColliderType: 1
-    m_RandomTransform: 0
-    m_Neighbors: 01000000
-    m_NeighborPositions:
-    - {x: 0, y: -1, z: 0}
-    m_RuleTransform: 0
-  - m_Id: 3
-    m_Sprites:
-    - {fileID: 21300000, guid: a360b7d1924bee8418b442444bcf82b9, type: 3}
-    m_GameObject: {fileID: 0}
-    m_MinAnimationSpeed: 1
-    m_MaxAnimationSpeed: 1
-    m_PerlinScale: 0.5
-    m_Output: 0
+    m_Output: 1
     m_ColliderType: 1
     m_RandomTransform: 0
     m_Neighbors: 
-    m_NeighborPositions:
-    - {x: -1, y: 1, z: 0}
-    - {x: 0, y: 1, z: 0}
-    - {x: 1, y: 1, z: 0}
-    - {x: -1, y: 0, z: 0}
-    - {x: 1, y: 0, z: 0}
-    - {x: -1, y: -1, z: 0}
-    - {x: 0, y: -1, z: 0}
-    - {x: 1, y: -1, z: 0}
+    m_NeighborPositions: []
     m_RuleTransform: 0
   tileName: Tile_Floor
   spriteAtlasAddress: Assets/AddressableResources/Tilemap/AtlasTile_01.spriteatlas

@@ -2,6 +2,7 @@ using System.IO;
 using System.Collections;
 using System;
 using System.Collections.Generic;
+using InnerDevToolCommon.Data;
 using UnityEngine;
 
 public class StaticManager : IManager<StaticManager>
@@ -32,5 +33,16 @@ public class StaticManager : IManager<StaticManager>
         {
             _StaticLoader.LoadTable(item);
         }
+    }
+
+    public T Get<T>(params object[] args) where T : RowData
+    {
+        var name = typeof(T).ToString();
+        IScriptableObject table;
+        if (!_StaticDataTable.TryGetValue(name + "Table", out table))
+        {
+            return null;
+        }
+        return table.Get<T>(args);
     }
 }
