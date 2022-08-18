@@ -34,7 +34,7 @@ public class PageNavigation
 
         if (_prevPage)
         {
-            _prevPage.Hide();
+            _prevPage.gameObject.SetActive(false);
             _stkPage.Push(_prevPage);
         }
 
