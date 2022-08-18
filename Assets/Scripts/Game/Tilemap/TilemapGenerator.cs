@@ -1,8 +1,13 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.Tilemaps;
+using Random = UnityEngine.Random;
 
 public class TilemapGenerator : MonoBehaviour
 {
@@ -55,6 +60,7 @@ public class TilemapGenerator : MonoBehaviour
     }
     [SerializeField] private RuleTileBase tileFloor;
     [SerializeField] private RuleTileBase tileWall;
+    [SerializeField] private RuleTileBase tileBase;
     
     private Tilemap _tilemap;
     private StaticOmniEveFloor _tilemapData;
@@ -72,16 +78,26 @@ public class TilemapGenerator : MonoBehaviour
     // empty tile count between each rooms
     const int WALL_THICKNESS_MIN = 1;
 
-    public RuleTile tileBase;
     public int floorIndex = 24;
-    
-    
+
+    [SerializeField] private bool IsDebugTest = false;
+
     // Start is called before the first frame update
     public void GenerateTilemap(int floorIndex = 1)
     {
         _tilemapData = StaticManager.Instance.Get<StaticOmniEveFloor>(floorIndex);
-        Debug.Log($"Load MapData: {_tilemapData.width}, {_tilemapData.height}");
 
+        if (IsDebugTest)
+        {
+            _tilemapData = new StaticOmniEveFloor();
+            _tilemapData.width = 32;
+            _tilemapData.height = 32;
+        
+            _tilemapData.room_width = 3;
+            _tilemapData.room_height = 3;
+            Debug.Log($"Load MapData: {_tilemapData.width}, {_tilemapData.height}");            
+        }
+        
         _tilemap = GetComponent<Tilemap>();
         _tilemap.ClearAllTiles();
         _dictTileData.Clear();
@@ -143,33 +159,33 @@ public class TilemapGenerator : MonoBehaviour
                 room.bottom = top + sizeY;
 
                 List<int> neighbors = new List<int>();
-                
+                    
                 // left
-                if (col > 1)
+                if (col > 0)
                 {
                     neighbors.Add(room.idx - 1);
                 }
 
                 // right
-                if (col < roomColumnIdxMax)
+                if (col < roomColumnIdxMax - 1)
                 {
                     neighbors.Add(room.idx + 1);
                 }
 
                 // top
-                if (row > 1)
-                {
-                    neighbors.Add(room.idx - roomColumnIdxMax);
-                }
-
-                // bottom
-                if (row < roomRowIdxMax)
+                if (row < roomRowIdxMax - 1)
                 {
                     neighbors.Add(room.idx + roomColumnIdxMax);
                 }
 
-                room.neighbors = neighbors;
+                // bottom
+                if (row > 0)
+                {
+                    neighbors.Add(room.idx - roomColumnIdxMax);
+                }
 
+                room.neighbors = neighbors;
+                
                 OmniEveSetTileFloorByRoom(room);
                 _listRoomData.Add(room);
             }
@@ -178,8 +194,6 @@ public class TilemapGenerator : MonoBehaviour
     
     protected void OmniEveSetTileFloorByRoom(RoomData room)
     {
-        DebugManager.Log($"room {room.idx} ({room.left}, {room.right}, {room.top}, {room.bottom})");
-
         for (var row = room.top; row < room.bottom; row++)
         {
             for (var col = room.left; col < room.right; col++)
@@ -202,6 +216,9 @@ public class TilemapGenerator : MonoBehaviour
             case TileData.TileType.Wall:
                 ruleTile = tileWall;
                 break;
+            case TileData.TileType.Passage:
+                ruleTile = tileBase;
+                break;
             default:
                 ruleTile = tileFloor;
                 break;
@@ -222,288 +239,92 @@ public class TilemapGenerator : MonoBehaviour
 
     protected void GeneratePassages()
     {
-        int startIndex = Random.Range(0, _listRoomData.Count);
-        List<RoomData> connectedRoom;
+        // pool
+        List<RoomData> listRoomData = new List<RoomData>(_listRoomData.OrderBy(a => Guid.NewGuid()).ToList());
 
-
-        /*List<int> unconnectedRoomIdxList = new List<int>();
-        List<int> connectedRoomIdxList = new List<int>();
-
-        foreach (var room in _listRoomData)
+        // get items
+        List<int> listRoomIndex = new List<int>();
+        for (int i = 0; i < listRoomData.Count; i++)
         {
-            unconnectedRoomIdxList.Add(room.idx);
+            listRoomIndex.Add(i);
         }
 
-        int unconnectedCount = unconnectedRoomIdxList.Count - 1;
-        connectedRoomIdxList.Add(unconnectedRoomIdxList[unconnectedCount]);
-
-        unconnectedRoomIdxList.RemoveAt(unconnectedCount);
-        unconnectedCount = unconnectedRoomIdxList.Count - 1;
-
-        while (unconnectedCount > 0)
+        Dictionary<int, RoomData> dictNode = new Dictionary<int, RoomData>();
+        while (listRoomIndex.Count > 0)
         {
-            int srcIdx = connectedRoomIdxList[Random.Range(0, connectedRoomIdxList.Count)];
-            RoomData connectedRoom = OmniEveGetRoom(srcIdx);
+            int elementIndex = listRoomIndex.First();
+            RoomData room = listRoomData[elementIndex];
 
-            int randomIdx = Random.Range(0, connectedRoom.neighbors.Count);
-            int dstIdx = connectedRoom.neighbors[Random.Range(0, connectedRoom.neighbors.Count)];
-
-            int roomIdx = connectedRoomIdxList.Find(x => x == dstIdx);
-            if (roomIdx <= 0)
+            bool isNewNode = false;
+            List<int> listNeighbor = new List<int>(room.neighbors.OrderBy(a => Guid.NewGuid()).ToList());
+            foreach (var nodeIndex in listNeighbor)
             {
-                GeneratePassageByRoomIdx(srcIdx, dstIdx);
+                RoomData root;
+                if (dictNode.TryGetValue(nodeIndex, out root) || dictNode.Count == 0)
+                {
+                    // already exist
+                    room.neighbors.Remove(nodeIndex);
 
-                unconnectedRoomIdxList.Remove(dstIdx);
-                connectedRoomIdxList.Add(dstIdx);
+                    if (!dictNode.ContainsKey(room.idx))
+                    {
+                        root.neighbors?.Add(room.idx);
+                        listRoomIndex.RemoveAt(0);
+                        
+                        RoomData node = new RoomData();
+                        node.idx = room.idx;
+                        node.neighbors = new List<int>();
+                        dictNode.Add(node.idx, node);
 
-                unconnectedCount = unconnectedRoomIdxList.Count - 1;
+                        isNewNode = true;
+                    }
+                    break;
+                }
             }
-        }*/
+
+            if (!isNewNode)
+            {
+                // move to next a room
+                listRoomIndex.RemoveAt(0);
+                listRoomIndex.Add(elementIndex);
+            }
+        }
+
+        foreach (var room in dictNode.Values)
+        {
+            foreach (var dstIdx in room.neighbors)
+            {
+                RoomData src = OmniEveGetRoom(room.idx);
+                RoomData dst = OmniEveGetRoom(dstIdx);
+                OmniEveConnectRoom(src, dst);
+            }
+        }
     }
 
     protected void OmniEveConnectRoom(RoomData src, RoomData dst)
     {
-        // todo
-        DebugManager.Log($"{src.idx} to {dst.idx}");
-        int srcX = Random.Range(src.left + 1, src.right - 1); 
-        int srcY = src.bottom;
-        int dstX = Random.Range(dst.left + 1, dst.right - 1); 
-        int dstY = dst.top;
-        int centerY = Random.Range(srcY + 1, dstY - 1);
-
         Vector2Int srcPosition = new Vector2Int(Random.Range(src.left +1, src.right -1), Random.Range(src.top +1, src.bottom -1));
-        Vector2Int dscPosition = new Vector2Int(Random.Range(dst.left +1, dst.right -1), Random.Range(dst.top +1, dst.bottom -1));
-        Vector2Int center = srcPosition - dscPosition;
-        center.x /= 2;
-        center.y /= 2;
+        Vector2Int dstPosition = new Vector2Int(Random.Range(dst.left +1, dst.right -1), Random.Range(dst.top +1, dst.bottom -1));
+        
+        Vector2 centerf = dstPosition - srcPosition;
+        centerf.x /= 2;
+        centerf.y /= 2;
 
-        int dirX = center.x > 0 ? 1 : -1; 
+        Vector2Int center = new Vector2Int((int)(centerf.x), (int)(centerf.y));
+        int dirX = centerf.x > 0 ? 1 : -1;
         for (int i = 0; i < Mathf.Abs(center.x) ; i++)
         {
-            int posX = srcPosition.x + i * dirX;
-            int posY = srcPosition.y;
-            SetTile(posX, posY, TileData.TileType.Floor);
+            SetTile(srcPosition.x + i * dirX, srcPosition.y, TileData.TileType.Floor);
+            SetTile(srcPosition.x + center.x + i * dirX, dstPosition.y, TileData.TileType.Floor);
+        }
+
+        int dirY = centerf.y > 0 ? 1 : -1;
+        for (int i = 0; i <= Mathf.Abs(center.y) ; i++)
+        {
+            SetTile(srcPosition.x + center.x, srcPosition.y + i * dirY, TileData.TileType.Floor);
+            SetTile(srcPosition.x + center.x, srcPosition.y + center.y + i * dirY, TileData.TileType.Floor);
         }
         
-        int dirY = center.y > 0 ? 1 : -1;
-        for (int i = 0; i < Mathf.Abs(center.y) ; i++)
-        {
-            
-        }
-    }
-
-    protected void GeneratePassageByRoomIdx(int srcIdx, int dstIdx)
-    {
-        RoomData src = OmniEveGetRoom(srcIdx);
-        RoomData dst = OmniEveGetRoom(dstIdx);
-
-        OmniEveConnectRoom(src, dst);
-        return;
-        
-        if (src.row == dst.row)
-        {
-            // left to right
-            OmniEveConnectRoomLeftToRight(src, dst);
-        }
-        else
-        {
-            // top to bottom
-            OmniEveConnectRoomTopToBottom(src, dst);
-        }
-    }
-
-    protected void OmniEveConnectRoomTopToBottom(RoomData src, RoomData dst)
-    {
-        int srcX = Random.Range(src.left + 1, src.right - 1); 
-        int srcY = src.bottom;
-        int dstX = Random.Range(dst.left + 1, dst.right - 1); 
-        int dstY = dst.top;
-        int centerY = Random.Range(srcY + 1, dstY - 1);
-
-        // (+ 1) (-1) �� Wall Ÿ���� �����ϱ� ���ؼ���
-        for (var y = srcY; y <= centerY + 1; y++)
-        {
-            if (y <= centerY)
-            {
-                SetTile(y, srcX, TileData.TileType.Passage);
-            }
-
-            // top side of passage line
-            TileData data;
-            if (GetTileByRowColumn(y, srcX - 1, out data))
-            {
-                if (!data.IsPassable())
-                {
-                    SetTile(y, srcX - 1, TileData.TileType.Wall);
-                }
-            }
-
-            // bottom side of passage line
-            if (GetTileByRowColumn(y, srcX + 1, out data))
-            {
-                if (!data.IsPassable())
-                {
-                    SetTile(y, srcX + 1, TileData.TileType.Wall);
-                }
-            }
-        }
-
-        for (var y = centerY - 1; y <= dstY; y++)
-        {
-            if (y >= centerY)
-            {
-                SetTile(y, dstX, TileData.TileType.Passage);
-            }
-
-            TileData data;
-            if (GetTileByRowColumn(y, dstX - 1, out data))
-            {
-                if (!data.IsPassable())
-                {
-                    SetTile(y, dstX - 1, TileData.TileType.Wall);
-                }
-            }
-
-            // bottom side of passage line
-            if (GetTileByRowColumn(y, dstX + 1, out data))
-            {
-                if (!data.IsPassable())
-                {
-                    SetTile(y, dstX + 1, TileData.TileType.Wall);
-                }
-            }
-        }
-
-        int dx = 1;
-        if (srcX > dstX)
-        {
-            dx = -1;
-        }
-
-        for (var i = 0; i < Mathf.Abs(dstX - srcX); i++)
-        {
-            int x = (i * dx) + srcX;
-            SetTile(centerY, x, TileData.TileType.Passage);
-
-
-            TileData data;
-            if (GetTileByRowColumn(centerY + 1, x, out data))
-            {
-                if (!data.IsPassable())
-                {
-                    SetTile(centerY + 1, x, TileData.TileType.Wall);
-                }
-            }
-
-            // bottom side of passage line
-            if (GetTileByRowColumn(centerY - 1, x, out data))
-            {
-                if (!data.IsPassable())
-                {
-                    SetTile(centerY - 1, x, TileData.TileType.Wall);
-                }
-            }
-        }
-    }
-
-    protected void OmniEveConnectRoomLeftToRight(RoomData src, RoomData dst)
-    {
-        int srcX = src.right;
-        int srcY = Random.Range(src.top + 1, src.bottom - 1);
-        int dstX = dst.left;
-        int dstY = Random.Range(dst.top + 1, dst.bottom - 1);
-        int centerX = Random.Range(srcX + 1, dstX - 1);
-
-        for (var x = srcX; x <= centerX + 1; x++)
-        { 
-            if (x <= centerX)
-            {
-                SetTile(srcY, x, TileData.TileType.Passage);
-            }
-
-            // top side of passage line
-            TileData data;
-            if (GetTileByRowColumn(srcY - 1, x, out data))
-            {
-                Debug.Log($"{data.tileType}");
-                if(!data.IsPassable())
-                {
-                    SetTile(srcY - 1, x, TileData.TileType.Wall);
-                }
-            }
-
-            // bottom side of passage line
-            if (GetTileByRowColumn(srcY + 1, x, out data))
-            {
-                if (!data.IsPassable())
-                {
-                    SetTile(srcY + 1, x, TileData.TileType.Wall);
-                }
-            }
-        }
-
-        for (var x = centerX - 1; x <= dstX; x++)
-        {
-            if (x >= centerX)
-            {
-                SetTile(dstY, x, TileData.TileType.Passage);
-            }
-
-            TileData data;
-            if (GetTileByRowColumn(dstY - 1, x, out data))
-            {
-                if (!data.IsPassable())
-                {
-                    SetTile(dstY - 1, x, TileData.TileType.Wall);
-                }
-            }
-
-            // bottom side of passage line
-            if (GetTileByRowColumn(dstY + 1, x, out data))
-            {
-                if (!data.IsPassable())
-                {
-                    SetTile(dstY + 1, x, TileData.TileType.Wall);
-                }
-            }
-        }
-
-        int dy = 1;
-        if (srcY > dstY)
-        {
-            dy = -1;
-        }
-
-        for (var i = 0; i < Mathf.Abs(dstY - srcY); i++)
-        {
-            int y = (i * dy) + srcY;
-            SetTile(y, centerX, TileData.TileType.Passage);
-
-            TileData data;
-            if (GetTileByRowColumn(y, centerX - 1, out data))
-            {
-                if (!data.IsPassable())
-                {
-                    SetTile(y, centerX - 1, TileData.TileType.Wall);
-                }
-            }
-
-            // bottom side of passage line
-            if (GetTileByRowColumn(y, centerX + 1, out data))
-            {
-                if (!data.IsPassable())
-                {
-                    SetTile(y, centerX + 1, TileData.TileType.Wall);
-                }
-            }
-        }
-    }
-
-
-    protected bool GetTileByRowColumn(int row, int col, out TileData data)
-    {
-        int key = TileData.GetKey(row, col);
-        return _dictTileData.TryGetValue(key, out data);
+        //DebugManager.Log($"{src.idx} ({srcPosition.x}, {srcPosition.y}) to {dst.idx} ({dstPosition.x}, {dstPosition.y}) = {center.x}, {center.y}/ {centerf.x}, {centerf.y}");
     }
 }
 
