@@ -29,7 +29,6 @@ public class ResourcesManager: IManager<GameManager>
             callback(obj.Result);
         };
     }
-
     public static void OnDestroy(string objName)
     {
         if (!handleDictionary.ContainsKey(objName))

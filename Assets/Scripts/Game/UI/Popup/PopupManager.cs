@@ -1,20 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
 public class PopupManager : IManager<PopupManager>
 {
-    private Queue<Popup> _queuePopup;
+    private List<Popup> _queuePopup;
     private Popup _currentPopup;
     private static Transform _parent;
     private int _loadPopupCount;
-    private bool _isLoadedAll;
+    private List<string> _popupNameList;
 
     void Start()
     {
-        _queuePopup = new Queue<Popup>();
+        _queuePopup = new List<Popup>();
         _parent = GameObject.Find("PopupCanvas").transform;
+        _popupNameList = new List<string>();
         Clear();
     }
     
@@ -38,9 +40,11 @@ public class PopupManager : IManager<PopupManager>
             DebugManager.Log("PopupList is empty.");
             return;
         }
-        
-        _loadPopupCount = popupList.Count;
 
+        _popupNameList = popupList;
+        _loadPopupCount = _popupNameList.Count;
+
+        Clear();
         foreach (string popupName in popupList)
         {
             AddPopup(popupName);
@@ -53,8 +57,8 @@ public class PopupManager : IManager<PopupManager>
             (result) =>
             {
                 Popup popup = result.GetComponent<Popup>();
-                _queuePopup.Enqueue(popup);
                 popup.gameObject.SetActive(false);
+                _queuePopup.Add(popup);
                 OnPopupLoaded();
             });
     }
@@ -63,23 +67,35 @@ public class PopupManager : IManager<PopupManager>
     {
         --_loadPopupCount;
 
-        if (_loadPopupCount <= 0)
+        if (0 < _loadPopupCount)
         {
-            _isLoadedAll = true;
+            return;
         }
 
-        if (_isLoadedAll)
+        _queuePopup.Sort((x, y) =>
         {
-            Run();
-        }
+            string leftName = x.GetType().ToString();
+            string rightName = y.GetType().ToString();
+            int leftIndex = _popupNameList.IndexOf(leftName);
+            int rightIndex = _popupNameList.IndexOf(rightName);
+                
+            if (leftIndex < rightIndex)
+            {
+                return 0;
+            }
+            else
+            {
+                return 1;
+            }
+        });
+        
+        Run();
     }
 
     public void Clear()
     {
         _queuePopup.Clear();
         _currentPopup = null;
-        _loadPopupCount = 0;
-        _isLoadedAll = false;
     }
 
     private void Run()
@@ -89,8 +105,9 @@ public class PopupManager : IManager<PopupManager>
             DebugManager.Log("Queue popup is empty.");
             return;
         }
-        
-        _currentPopup = _queuePopup.Dequeue();
+
+        _currentPopup = _queuePopup.First();
+        _queuePopup.RemoveAt(0);
         _currentPopup.Show();
     }
     
@@ -103,7 +120,9 @@ public class PopupManager : IManager<PopupManager>
             return;
         }
         
-        Popup newPopup = _queuePopup.Dequeue();
+        Popup newPopup = _queuePopup.First();
+        _queuePopup.RemoveAt(0);
+        
         _currentPopup = newPopup;
         _currentPopup.Show();
     }

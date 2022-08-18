@@ -15,6 +15,7 @@ public class PageNavigationManager : IManager<PageNavigationManager>
     
     void Start()
     {
+        EventManager.Instance.Init();
         PageNav = new PageNavigation();
         Page startPage = PageNav.Push("page_start");
     }
