@@ -16,7 +16,7 @@ public class SceneGame : IScene
     {
         Init();
         // Init Grid for a Tilemap
-        // ResourcesManager.Instance.InstantiateAsyncFromLabel("InitGrid", OnInitGrid);
+        ResourcesManager.Instance.InstantiateAsyncFromLabel("InitGrid", OnInitGrid);
     }
 
 

@@ -14,10 +14,44 @@ public class TilemapGenerator : MonoBehaviour
     public struct RoomData
     {
         public int idx;
-        public int row;
-        public int col;
-        public int left, top, right, bottom;
+        public Vector2Int position;           // room (0,0) (0,1),...
+        public RectInt tileSize;
         public List<int> neighbors;
+
+        public Vector2Int GetDirectionToRoom(RoomData room)
+        {
+            Vector2Int dir = new Vector2Int();
+            if (neighbors.Contains(room.idx))
+            {
+                dir = room.position - position;
+            }
+            else
+            {
+                DebugManager.Log($"!error {idx} to {room.idx} : {neighbors.Count}");
+                foreach (var index in neighbors)
+                {
+                    DebugManager.Log($"{index}");
+                }
+            }
+            return dir;
+        }
+
+        public TileData.TileType GetTileType(int x, int y)
+        {
+            if (tileSize.xMin == x || tileSize.xMax - 1 == x || tileSize.yMin == y || tileSize.yMax - 1 == y)
+            {
+                return TileData.TileType.Wall;
+            }
+            return TileData.TileType.Floor;
+        }
+
+        public RoomData(RoomData data)
+        {
+            idx = data.idx;
+            position = data.position;
+            tileSize = data.tileSize;
+            neighbors = new List<int>(data.neighbors);
+        }
     }
 
     public struct TileData
@@ -66,24 +100,23 @@ public class TilemapGenerator : MonoBehaviour
     private StaticOmniEveFloor _tilemapData;
     private List<RoomData> _listRoomData;
     Dictionary<int, TileData> _dictTileData = new Dictionary<int, TileData>();
-    
-    int tileRowIdxMax = 0;
-    int tileColumnIdxMax = 0;
-    int roomRowIdxMax = 0;
-    int roomColumnIdxMax = 0;
 
-    const int ROOM_SIZE_X_MIN = 5;
-    const int ROOM_SIZE_Y_MIN = 5;
-    
+    private Vector2Int _tilemapSize = new Vector2Int();
+    private Vector2Int _roomMaxCount = new Vector2Int();
+
+    const int ROOM_MIN_SIZE_X = 5;
+    const int ROOM_MIN_SIZE_Y = 5;
+
     // empty tile count between each rooms
-    const int WALL_THICKNESS_MIN = 1;
+    const int WALL_MIN_THICKNESS = 1;
 
     public int floorIndex = 24;
 
     [SerializeField] private bool IsDebugTest = false;
+    [SerializeField] private bool IsDebugClear = false;
 
     // Start is called before the first frame update
-    public void GenerateTilemap(int floorIndex = 1)
+    public void GenerateTilemap()
     {
         _tilemapData = StaticManager.Instance.Get<StaticOmniEveFloor>(floorIndex);
 
@@ -102,6 +135,10 @@ public class TilemapGenerator : MonoBehaviour
         _tilemap.ClearAllTiles();
         _dictTileData.Clear();
 
+        if (IsDebugClear)
+        {
+            return;
+        }
         GenerateRooms();
         GeneratePassages();
     }
@@ -111,81 +148,84 @@ public class TilemapGenerator : MonoBehaviour
         // todo
         return true;
     }
-    
-    
+
     protected void GenerateRooms()
     {
         _listRoomData = new List<RoomData>();
 
         // tilemap size = tileColumnIdxMax * tileRowIdxMax
-        tileColumnIdxMax = _tilemapData.width;
-        tileRowIdxMax = _tilemapData.height;
-        
+        _tilemapSize.x = _tilemapData.width;
+        _tilemapSize.y = _tilemapData.height;
+
         // total rooms = roomColumnIdxMax * roomRowIdxMax
-        roomColumnIdxMax = _tilemapData.room_width;
-        roomRowIdxMax = _tilemapData.room_height;
+        _roomMaxCount.x = _tilemapData.room_width;
+        _roomMaxCount.y = _tilemapData.room_height;
 
-        int roomSizeXMax = Mathf.FloorToInt((tileColumnIdxMax - (roomColumnIdxMax - 1) * WALL_THICKNESS_MIN) / roomColumnIdxMax);
-        int roomSizeYMax = Mathf.FloorToInt((tileRowIdxMax - (roomRowIdxMax - 1) * WALL_THICKNESS_MIN) / roomRowIdxMax);
+        Vector2Int roomMaxSize = new Vector2Int();
+        roomMaxSize.x = Mathf.FloorToInt((_tilemapSize.x - (_roomMaxCount.x - 1) * WALL_MIN_THICKNESS) / _roomMaxCount.x);
+        roomMaxSize.y = Mathf.FloorToInt((_tilemapSize.y - (_roomMaxCount.y - 1) * WALL_MIN_THICKNESS) / _roomMaxCount.y);
 
-        for (var row = 0; row < roomRowIdxMax; row++)
+        DebugManager.Log($"Room: {roomMaxSize.ToString()}/ Tilemap: {_tilemapSize.ToString()}");
+        
+        /*
+         *  +y
+         *  | (idx = 2n),..
+         *  | (idx = n)
+         *  | (idx = 0), (idx = 1),..
+         *  -----------> +x
+         */
+        for (var positionY = 0; positionY < _roomMaxCount.y; positionY++)
         {
-            for (var col = 0; col < roomColumnIdxMax; col++)
+            for (var positionX = 0; positionX < _roomMaxCount.x; positionX++)
             {
-                int sizeX = Random.Range(ROOM_SIZE_X_MIN, roomSizeXMax);
-                int sizeY = Random.Range(ROOM_SIZE_Y_MIN, roomSizeYMax);
-
+                int roomSizeX = Random.Range(ROOM_MIN_SIZE_X, roomMaxSize.x);
+                int roomSizeY = Random.Range(ROOM_MIN_SIZE_Y, roomMaxSize.y);
+                
                 if (!OmniEveIsNormalStageFloor(floorIndex))
                 {
-                    sizeX = roomSizeXMax;
-                    sizeY = roomSizeYMax;
+                    roomSizeX = roomMaxSize.x;
+                    roomSizeY = roomMaxSize.y;
                 }
-
-                int localLeft = Random.Range(0, roomSizeXMax - sizeX);
-                int localTop = Random.Range(0, roomSizeYMax - sizeY);
-
-                int left = (roomSizeXMax + WALL_THICKNESS_MIN) * col + localLeft;
-                int top = (roomSizeYMax + WALL_THICKNESS_MIN) * row + localTop;
 
                 RoomData room = new RoomData();
                 room.idx = _listRoomData.Count;
-                room.row = row;
-                room.col = col;
+                room.position = new Vector2Int(positionX, positionY);
 
-                // Tile coordinates (includes wall tiles)
-                room.left = left;
-                room.top = top;
-                room.right = left + sizeX;
-                room.bottom = top + sizeY;
+                Vector2Int offset = new Vector2Int();
+                offset.x = Random.Range(0, roomMaxSize.x - roomSizeX);
+                offset.y = Random.Range(0, roomMaxSize.y - roomSizeY);
+
+                RectInt tileSize = new RectInt();
+                tileSize.x = offset.x + (roomMaxSize.x + WALL_MIN_THICKNESS) * positionX;
+                tileSize.y = offset.y + (roomMaxSize.y + WALL_MIN_THICKNESS) * positionY;
+                tileSize.size = new Vector2Int(roomSizeX, roomSizeY);
+                room.tileSize = tileSize;
 
                 List<int> neighbors = new List<int>();
                     
                 // left
-                if (col > 0)
+                if (positionX > 0)
                 {
                     neighbors.Add(room.idx - 1);
                 }
-
+                // top
+                if (positionY < _roomMaxCount.y - 1)
+                {
+                    neighbors.Add(room.idx + _roomMaxCount.x);
+                }
                 // right
-                if (col < roomColumnIdxMax - 1)
+                if (positionX < _roomMaxCount.x - 1)
                 {
                     neighbors.Add(room.idx + 1);
                 }
-
-                // top
-                if (row < roomRowIdxMax - 1)
-                {
-                    neighbors.Add(room.idx + roomColumnIdxMax);
-                }
-
                 // bottom
-                if (row > 0)
+                if (positionY > 0)
                 {
-                    neighbors.Add(room.idx - roomColumnIdxMax);
+                    neighbors.Add(room.idx - _roomMaxCount.x);
                 }
-
                 room.neighbors = neighbors;
-                
+
+                //DebugManager.Log($"room: {room.idx}({positionX}, {positionY}) = {room.idx - 1}, {room.idx + _roomMaxCount.x}, {room.idx + 1}, {room.idx - _roomMaxCount.x} : total {neighbors.Count}");
                 OmniEveSetTileFloorByRoom(room);
                 _listRoomData.Add(room);
             }
@@ -194,16 +234,13 @@ public class TilemapGenerator : MonoBehaviour
     
     protected void OmniEveSetTileFloorByRoom(RoomData room)
     {
-        for (var row = room.top; row < room.bottom; row++)
+        var tileSize = room.tileSize;
+        for (var y = tileSize.yMin; y < tileSize.yMax; y++)
         {
-            for (var col = room.left; col < room.right; col++)
+            for (var x = tileSize.xMin; x < tileSize.xMax; x++)
             {
-                TileData.TileType tileType = TileData.TileType.Floor;
-                if (row == room.top || row == room.bottom -1 || col == room.left || col == room.right -1)
-                {
-                    tileType = TileData.TileType.Wall;
-                }
-                SetTile(col, row, tileType);
+                TileData.TileType tileType = room.GetTileType(x, y);
+                SetTile(x, y, tileType);
             }
         }
     }
@@ -228,6 +265,14 @@ public class TilemapGenerator : MonoBehaviour
         data.position = new Vector3Int(posX, posY, 0);
         data.tileType = tileType;
 
+        if (TileData.TileType.Wall == tileType)
+        {
+            if (_dictTileData.ContainsKey(data.GetKey()))
+            {
+                return;
+            }
+        }
+
         _dictTileData.TryAdd(data.GetKey(), data);
         _tilemap.SetTile(data.position, ruleTile);
     }
@@ -240,7 +285,7 @@ public class TilemapGenerator : MonoBehaviour
     protected void GeneratePassages()
     {
         // pool
-        List<RoomData> listRoomData = new List<RoomData>(_listRoomData.OrderBy(a => Guid.NewGuid()).ToList());
+        List<RoomData> listRoomData = _listRoomData.OrderBy(a => Guid.NewGuid()).ToList().ConvertAll(x => new RoomData(x));
 
         // get items
         List<int> listRoomIndex = new List<int>();
@@ -300,31 +345,45 @@ public class TilemapGenerator : MonoBehaviour
         }
     }
 
+    
+    
     protected void OmniEveConnectRoom(RoomData src, RoomData dst)
     {
-        Vector2Int srcPosition = new Vector2Int(Random.Range(src.left +1, src.right -1), Random.Range(src.top +1, src.bottom -1));
-        Vector2Int dstPosition = new Vector2Int(Random.Range(dst.left +1, dst.right -1), Random.Range(dst.top +1, dst.bottom -1));
+        Rect dstRect = Rect.MinMaxRect(dst.tileSize.xMin + 2, dst.tileSize.yMin + 2, dst.tileSize.xMax - 2, dst.tileSize.yMax - 2);
+        Vector2Int dstPosition = new Vector2Int(Random.Range((int)dstRect.xMin, (int)dstRect.xMax), Random.Range((int)dstRect.yMin, (int)dstRect.yMax));
+        Vector2Int srcPosition = new Vector2Int(Random.Range(src.tileSize.xMin +1, src.tileSize.xMax -1), Random.Range(src.tileSize.yMin +1, src.tileSize.yMax -1));
         
-        Vector2 centerf = dstPosition - srcPosition;
-        centerf.x /= 2;
-        centerf.y /= 2;
-
-        Vector2Int center = new Vector2Int((int)(centerf.x), (int)(centerf.y));
-        int dirX = centerf.x > 0 ? 1 : -1;
-        for (int i = 0; i < Mathf.Abs(center.x) ; i++)
-        {
-            SetTile(srcPosition.x + i * dirX, srcPosition.y, TileData.TileType.Floor);
-            SetTile(srcPosition.x + center.x + i * dirX, dstPosition.y, TileData.TileType.Floor);
-        }
-
-        int dirY = centerf.y > 0 ? 1 : -1;
-        for (int i = 0; i <= Mathf.Abs(center.y) ; i++)
-        {
-            SetTile(srcPosition.x + center.x, srcPosition.y + i * dirY, TileData.TileType.Floor);
-            SetTile(srcPosition.x + center.x, srcPosition.y + center.y + i * dirY, TileData.TileType.Floor);
-        }
+        // set direction
+        int dirX = Math.Clamp(dstPosition.x - srcPosition.x, -1, 1);
+        int dirY = Math.Clamp(dstPosition.y - srcPosition.y, -1, 1);
         
-        //DebugManager.Log($"{src.idx} ({srcPosition.x}, {srcPosition.y}) to {dst.idx} ({dstPosition.x}, {dstPosition.y}) = {center.x}, {center.y}/ {centerf.x}, {centerf.y}");
+        // srcPosition to dstPosition
+        Vector2Int position = srcPosition;
+        while (!dstRect.Contains(position))
+        {
+            for (int y = -1; y <= 1; y++)
+            {
+                for (int x = -1; x <= 1; x++)
+                {
+                    TileData.TileType tileType = TileData.TileType.Wall;
+                    if (x == 0 && y == 0)
+                    {
+                        tileType = TileData.TileType.Floor;
+                    };
+                    SetTile(position.x + x, position.y + y, tileType);
+                }
+            }
+            
+            if (position.y != dstPosition.y && position.x >= (dstPosition.x - srcPosition.x) * 0.5)
+            {
+                position.y += dirY;
+            }
+            else
+            {
+                position.x += dirX;
+            }
+        }
+        // DebugManager.Log($"{src.idx} - {src.position.ToString()} = ({src.GetDirectionToRoom(dst)}) to {dst.idx} - {dst.position.ToString()} = ({dst.GetDirectionToRoom(src)})");
     }
 }
 

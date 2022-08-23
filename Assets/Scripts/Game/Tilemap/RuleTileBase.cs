@@ -19,6 +19,8 @@ public class RuleTileBase : RuleTile<RuleTileBase.Neighbor> {
 
     public AssetReferenceAtlasedSprite sprite;
     public AssetReferenceT<SpriteAtlas> spriteAtlas;
+
+    [SerializeField] private bool isWall = false;
     
     public string TileName
     {
@@ -32,20 +34,19 @@ public class RuleTileBase : RuleTile<RuleTileBase.Neighbor> {
         set => this.spriteAtlasAddress = value;
     }
 
-    public class TilingRule : RuleTile.TilingRule
-    {
-    
-    }
-    
     public class Neighbor : RuleTile.TilingRule.Neighbor 
     {
-        public const int Null = 3;
-        public const int NotNull = 4;
+        public const int Wall = 3;
+        public const int Null = 4;
+        public const int NotNull = 5;
     }
 
-    public override bool RuleMatch(int neighbor, TileBase tile) 
+    public override bool RuleMatch(int neighbor, TileBase tile)
     {
+        RuleTileBase ruleTile = tile as RuleTileBase;
+        
         switch (neighbor) {
+            case Neighbor.Wall: return ruleTile == null || ruleTile.isWall;
             case Neighbor.Null: return tile == null;
             case Neighbor.NotNull: return tile != null;
         }
@@ -79,7 +80,6 @@ public class RuleTileBaseEditor : RuleTileEditor
     private void OnDrawElementCallback(Rect rect, int index, bool isactive, bool isfocused)
     {
         RuleTile.TilingRule rule = tile.m_TilingRules[index];
-        DebugManager.Log(($"OnDrawElementCallback {index}"));
     }
     
     private System.Type GetGenericTypeFromAssetReference(AssetReference assetReferenceObject)
