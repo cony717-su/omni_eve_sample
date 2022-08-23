@@ -69,11 +69,6 @@ public class IScriptableObject : ScriptableObject
     public void Save(string fileName = "")
     {
         string fullName = GetFullName(fileName);
-        if (!File.Exists(fullName))
-        {
-            DebugManager.Log($"!File.Exists {fullName}");
-            return;
-        }
         var json = JsonUtility.ToJson(this, true);
         File.WriteAllText(fullName, json);
     }
