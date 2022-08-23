@@ -3,8 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UniRx;
 using UnityEngine;
-// Reference the Unity Analytics namespace
-using UnityEngine.Analytics;
+using UnityEngine.SocialPlatforms;
 
 public class SceneTitle : IScene
 {
@@ -15,6 +14,7 @@ public class SceneTitle : IScene
 
     private void Start()
     {
-        Init();
+        StaticManager.Instance.Load();
+        LocaleManager.LoadLocale("locale");
     }
 }
