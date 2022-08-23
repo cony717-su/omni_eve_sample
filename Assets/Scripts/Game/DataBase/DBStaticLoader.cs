@@ -6,6 +6,8 @@ using System.Collections.Generic;
 
 using InnerDevTool;
 using InnerDevTool.Data;
+using InnerDevToolCommon;
+using InnerDevToolCommon.Data;
 using InnerDevToolCommon.Database;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -15,13 +17,37 @@ public class DBStaticLoader : MonoBehaviour
 {
     public UserConfigData _UserConfigData;
 
-    void Start()
+    private void Start()
+    {
+        Init();
+    }
+
+    private void Init()
     {
         LoadConfigFile();
 
         _UserConfigData = UserConfigData.Create<UserConfigData>();
-       
+
         Connect(GetNickName(), GetServerName());
+    }
+
+    public void LoadTable(IScriptableObject dataTable)
+    {
+        // todo
+        /*StaticOmniEveFloor mapData = DBLookup.Instance.StaticData.StaticOmniEveFloorTable.Get(floorIndex);
+        Debug.Log($"Load MapData: {mapData.width}, {mapData.height}");*/
+
+        var property = dataTable.GetType().GetProperty("_DataTable");
+        property.SetValue(dataTable, Activator.CreateInstance(property.PropertyType));
+
+        Type staticRowType = property.PropertyType.GetGenericArguments()[0];
+        var metas = RowData.GetMetas(staticRowType);
+        var dataObjects = DatabaseApplier.Instance.SelectRows(staticRowType, metas);
+        var table = property.GetValue(dataTable) as IRowStorage;
+        foreach (var data in dataObjects)
+        {
+            table.BuildRow(data);
+        }
     }
 
     private void OnDestroy()
@@ -38,6 +64,7 @@ public class DBStaticLoader : MonoBehaviour
 
         DebugManager.Log("Disconnect DB");
     }
+
     bool Connect(string nickName, string dbName)
     {
         if (string.IsNullOrEmpty(nickName) || string.IsNullOrEmpty(dbName))
@@ -62,6 +89,8 @@ public class DBStaticLoader : MonoBehaviour
         DBLookup.Instance.StaticData = new StaticData();
         DBLookup.Instance.StaticData.Init();
 
+        // todo
+        StaticManager.Instance.Load();
         return true;
     }
 

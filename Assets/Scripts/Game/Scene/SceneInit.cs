@@ -11,4 +11,8 @@ public class SceneInit : IScene
     {
         MoveToScene(TargetSceneName);
     }
+    protected override void OnInit()
+    {
+
+    }
 }

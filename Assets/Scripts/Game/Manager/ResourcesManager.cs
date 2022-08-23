@@ -6,7 +6,7 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 
-public class ResourcesManager: IManager<GameManager>
+public class ResourcesManager : IManager<ResourcesManager>
 {
     private static Dictionary<string, AsyncOperationHandle> handleDictionary;
 
@@ -64,5 +64,15 @@ public class ResourcesManager: IManager<GameManager>
                 callback(obj.Result);
             }
         };
+    }
+    
+    public void InstantiateAsyncFromLabel(string labelName, UnityAction<GameObject> callback)
+    {
+        Addressables.LoadResourceLocationsAsync(labelName).Completed +=
+            (handle) =>
+            {
+                string assetPath = handle.Result[0].ToString();
+                InstantiateAssetAsync(assetPath, null, false, true, callback);
+            };
     }
 }

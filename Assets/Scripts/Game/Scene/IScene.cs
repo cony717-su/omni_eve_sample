@@ -8,10 +8,16 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 
-public class IScene : MonoBehaviour
+public abstract class IScene : MonoBehaviour
 {
     protected void MoveToScene(string targetSceneName)
     {
         GameSceneManager.Instance.MoveToScene(targetSceneName);
     }
+
+    public void Init()
+    {
+        OnInit();
+    }
+    protected abstract void OnInit();
 }

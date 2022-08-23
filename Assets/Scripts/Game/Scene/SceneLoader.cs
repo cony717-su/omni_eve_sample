@@ -8,4 +8,6 @@ public class SceneLoader : IScene
     {
         
     }
+
+    protected override void OnInit() { }
 }

@@ -1,5 +1,11 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
+using Shiftup.CommonLib.Data.Attributes;
+using InnerDevToolCommon.Attributes;
+using InnerDevToolCommon.Common;
+using InnerDevToolCommon.Data;
+
 using UnityEngine;
 
 public class IScriptableObject : ScriptableObject
@@ -18,7 +24,7 @@ public class IScriptableObject : ScriptableObject
             return _FileName;
         }
     }
-
+    
     private string GetFullName(string fileName)
     {
         if (string.IsNullOrEmpty(fileName))
@@ -37,12 +43,23 @@ public class IScriptableObject : ScriptableObject
         return inst;
     }
 
+    public T Get<T>(params object[] args) where T : RowData
+    {
+        InnerTable<T> dataTable = (InnerTable<T>)GetType().GetProperty("_DataTable").GetValue(this);
+        return dataTable.Get(args);
+    }
+
+    public void LoadTable()
+    {
+
+    }
+
     public void Load(string fileName = "")
     {
         string fullName = GetFullName(fileName);
         if (!File.Exists(fullName))
         {
-            DebugManager.Log($"!File.Exists {fullName}");
+            DebugManager.Log($"!File.Exists {fullName} {GetType()}");
             return;
         }
         var json = File.ReadAllText(fullName);
