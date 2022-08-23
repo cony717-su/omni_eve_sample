@@ -33,6 +33,74 @@ MonoBehaviour:
     m_Address: SceneLoader
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 47c68e068e322104b9ba62b68d5f46ff
+    m_Address: locale
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 64306b50eab17b045a881ca0f3d6927a
+    m_Address: locale_item
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: f22d5f847e6ee9d45b91feeab2ec6f25
+    m_Address: popup_test
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: d4c5fcb2658e772468d79b63c7292f78
+    m_Address: popup_ok
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 903147b6e1ae71b4eab1872924a5e1f3
+    m_Address: a051_01
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 437557dfa8355014faf5f74077f9c431
+    m_Address: a107_01
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 49074a5e404701347963dc949492942f
+    m_Address: a112_01
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 3693e79e1d805ed439d025c68c7e2a37
+    m_Address: c001_02_ci_F
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: c716098c19917fc46bae106c53d15bd0
+    m_Address: c002_01_ci_F
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 79cb3863a7b42b441906c0fbb63f9a4f
+    m_Address: davi
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: b0414f7ab98bc9e41804c2f725da42a9
+    m_Address: ele_slot_base
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 1fc4c60d40f1e8d41bcfd35a80ee1332
+    m_Address: ele_slot_frame_blue
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: da2dcffa448379840a808ccee2faecae
+    m_Address: ele_slot_frame_gold
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: f12cae3170246704a9ec2e14335f8214
+    m_Address: ele_slot_frame_green
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 794ffd715cae6404a9ddeba25dbc014e
+    m_Address: ele_slot_frame_red
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 678e8238c20fb0c4fa5917b2e6263d52
+    m_Address: ele_slot_frame_violet
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 18a2212aebc2f134991471f410bb6314
+    m_Address: ele_slot_frame_white
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 8e2cd4983dffac84ebf8357c0ce5089d, type: 2}
   m_SchemaSet:

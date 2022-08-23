@@ -21,7 +21,6 @@ public class UIGenerator : IManager<UIGenerator>
         GameObject textObj = GameObject.Find(textObjName);
 
         Text txt = textObj.GetComponent<Text>();
-        string locale = txt.text;
         txt.text = Util.Util.GetLocaleText(key);
     }
 }
