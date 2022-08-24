@@ -75,6 +75,8 @@ namespace InnerDevToolCommon.Database
             {
                 connString.AppendFormat("port={0};", connInfoHostNPort[1]);
             }
+            
+            connString.Append("convert zero datetime=true;");
             return connString.ToString();
         }
 
@@ -91,6 +93,8 @@ namespace InnerDevToolCommon.Database
             {
                 connString.AppendFormat("port={0};", connInfoHostNPort[1]);
             }
+
+            connString.Append("convert zero datetime=true;");
             return connString.ToString();
         }
 
