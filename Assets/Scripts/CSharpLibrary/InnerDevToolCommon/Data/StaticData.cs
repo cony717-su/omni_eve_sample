@@ -25,7 +25,7 @@ namespace InnerDevTool.Data
     public class StaticData
     {
         /*
-         * ±âÁ¸ ¹æ½Ä
+         * ê¸°ì¡´ ë°©ì‹
          * try
          * {
          *    string query = "SELECT * FROM static_area";
@@ -44,9 +44,10 @@ namespace InnerDevTool.Data
          * {
          * }
          *
-         * º¯°æµÈ ¹æ½Ä
-         * Init() ÇÔ¼ö¿¡¼­ static row type's InnerTable Å¸ÀÔÀÇ Property ¸¦ º¸°í DB µ¥ÀÌÅÍ¸¦ ÀÚµ¿À¸·Î ÀĞÀ½
+         * ë³€ê²½ëœ ë°©ì‹
+         * Init() í•¨ìˆ˜ì—ì„œ static row type's InnerTable íƒ€ì…ì˜ Property ë¥¼ ë³´ê³  DB ë°ì´í„°ë¥¼ ìë™ìœ¼ë¡œ ì½ìŒ
          */
+        
         public InnerTable<StaticOmniEveFloor> StaticOmniEveFloorTable { get; set; }
 
         public InnerTable<StaticOmniEveItem> StaticOmniEveItemTable { get; set; }
@@ -54,7 +55,7 @@ namespace InnerDevTool.Data
         public InnerTable<StaticOmniEveMob> StaticOmniEveMobTable { get; set; }
 
         /**
-         * Å¸ÀÔÀ» Á¤ÀÇÇÏÁö ¾Ê°í DB µ¥ÀÌÅÍ¸¦ ÀĞÀ» °æ¿ì
+         * íƒ€ì…ì„ ì •ì˜í•˜ì§€ ì•Šê³  DB ë°ì´í„°ë¥¼ ì½ì„ ê²½ìš°
          *
          * ReadStaticData("static_characters", (data) => {
          *    ~~~
