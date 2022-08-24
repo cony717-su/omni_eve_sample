@@ -33,8 +33,6 @@ public class StaticManager : IManager<StaticManager>
         {
             _StaticLoader.LoadTable(item);
         }
-        
-        
     }
 
     public T Get<T>(params object[] args) where T : RowData
@@ -47,11 +45,4 @@ public class StaticManager : IManager<StaticManager>
         }
         return table.Get<T>(args);
     }
-}
-
-
-
-enum EventName
-{
-    OnAddCallback,
 }
