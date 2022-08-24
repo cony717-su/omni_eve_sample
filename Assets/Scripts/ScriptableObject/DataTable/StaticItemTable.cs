@@ -36,10 +36,9 @@ public class StaticItem : RowData
     public int option_3_group_idx { get; set; }
     public int enhancement { get; set; }
     public int new_tag { get; set; }
-    
 }
 
 public class StaticItemTable : IScriptableObject
 {
-    public InnerTable<StaticOmniEveFloor> _DataTable { get; set; }
+    public InnerTable<StaticItem> _DataTable { get; set; }
 }

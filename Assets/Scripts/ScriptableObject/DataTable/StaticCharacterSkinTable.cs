@@ -16,5 +16,5 @@ public class StaticCharacterSkin : RowData
 
 public class StaticCharacterSkinTable : IScriptableObject
 {
-    public InnerTable<StaticOmniEveFloor> _DataTable { get; set; }
+    public InnerTable<StaticCharacterSkin> _DataTable { get; set; }
 }
