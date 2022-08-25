@@ -1,5 +1,0 @@
-[
-    {"type":"int"},
-    {"type":"string"},
-    {"type":"DateTime", "using":"System"}
-]
