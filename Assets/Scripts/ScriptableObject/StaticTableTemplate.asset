@@ -12,29 +12,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48e604faf30721042a163ad7bb3bc7a0, type: 3}
   m_Name: StaticTableTemplate
   m_EditorClassIdentifier: 
-  tableName: StaticItemOptionCount
+  _tableName: static_daily_skin_dungeon
   _listColumn:
   - isPrimaryKey: 1
     type: int
-    field: category
-  - isPrimaryKey: 1
-    type: int
-    field: grade
+    property: idx
   - isPrimaryKey: 0
     type: int
-    field: option_slot_1
+    property: 
   - isPrimaryKey: 0
     type: int
-    field: option_slot_1_need_enhancement
+    property: show_reward_1_material_idx
   - isPrimaryKey: 0
     type: int
-    field: option_slot_2
+    property: show_reward_2_material_idx
   - isPrimaryKey: 0
     type: int
-    field: option_slot_2_need_enhancement
+    property: 
   - isPrimaryKey: 0
     type: int
-    field: option_slot_3
+    property: 
   - isPrimaryKey: 0
     type: int
-    field: option_slot_3_need_enhancement
+    property: 
+  - isPrimaryKey: 0
+    type: int
+    property: 
