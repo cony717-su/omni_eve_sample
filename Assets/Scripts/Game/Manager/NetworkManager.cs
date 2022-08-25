@@ -66,4 +66,3 @@ public class ResponseServiceInfo : ResponseBase
     public string _clientNid;
     public string _packageSignature;
 }
-}
