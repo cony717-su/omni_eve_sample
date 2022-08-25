@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class StaticManager : IManager<StaticManager>
 {
-    private const string DATA_PATH = "Assets/Scripts/ScriptableObject/DataTable";
+    public const string DATA_PATH = "Assets/Scripts/ScriptableObject/DataTable";
     private DBStaticLoader _StaticLoader = null;
     private Dictionary<string, IScriptableObject> _StaticDataTable = new Dictionary<string, IScriptableObject>();
 

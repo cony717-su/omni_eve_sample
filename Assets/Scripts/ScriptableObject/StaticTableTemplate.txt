@@ -1,0 +1,13 @@
+using Shiftup.CommonLib.Data.Attributes;
+using InnerDevToolCommon.Data;
+using InnerDevToolCommon.Common;
+#NAMESPACE#
+public class #TABLENAME# : RowData
+{
+#PROPERTY#
+}
+
+public class #SCRIPTNAME# : IScriptableObject
+{
+    public InnerTable<#TABLENAME#> _DataTable { get; set; }
+}

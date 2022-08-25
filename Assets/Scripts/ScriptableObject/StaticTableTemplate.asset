@@ -12,4 +12,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48e604faf30721042a163ad7bb3bc7a0, type: 3}
   m_Name: StaticTableTemplate
   m_EditorClassIdentifier: 
-  tableName: 
+  tableName: StaticItemOptionCount
+  _listColumn:
+  - isPrimaryKey: 1
+    type: int
+    field: category
+  - isPrimaryKey: 1
+    type: int
+    field: grade
+  - isPrimaryKey: 0
+    type: int
+    field: option_slot_1
+  - isPrimaryKey: 0
+    type: int
+    field: option_slot_1_need_enhancement
+  - isPrimaryKey: 0
+    type: int
+    field: option_slot_2
+  - isPrimaryKey: 0
+    type: int
+    field: option_slot_2_need_enhancement
+  - isPrimaryKey: 0
+    type: int
+    field: option_slot_3
+  - isPrimaryKey: 0
+    type: int
+    field: option_slot_3_need_enhancement
