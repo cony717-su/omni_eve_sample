@@ -12,6 +12,11 @@ public class IScriptableObject : ScriptableObject
 {
     private string _FileName;
 
+    public string FilePath 
+    {
+        get => Application.persistentDataPath;
+    }
+
     private string FileName
     {
         get
