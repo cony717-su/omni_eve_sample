@@ -9,7 +9,7 @@ public class SceneGame : IScene
     GameObject _grid;
     protected override void OnInit()
     {
-        StaticManager.Instance.Init();
+        
     }
 
     private void Start()

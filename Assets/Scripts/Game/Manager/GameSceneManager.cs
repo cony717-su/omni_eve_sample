@@ -25,6 +25,10 @@ public class GameSceneManager : IManager<GameSceneManager>
     private string _ActiveSceneName;
     private SceneInstance _LoadedScene;
 
+    public string ActiveSceneName
+    {
+        get => SceneManager.GetActiveScene().name;
+    }
     public void MoveToScene(string targetSceneName)
     {
         _TargetSceneName = targetSceneName;
