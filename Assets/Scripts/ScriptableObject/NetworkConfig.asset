@@ -12,7 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 704f745319c64c3448d852df4b60aee6, type: 3}
   m_Name: NetworkConfig
   m_EditorClassIdentifier: 
-  _gameCode: 
-  _binaryVersion: 
-  _cryptKey: 
-  _apiServer: 
+  _gameCode: DC
+  _binaryVersion: 0.41.14
+  _cryptKey: 25a03a9143fedb53dfaceae170b460e9
+  _apiServer: http://dev-api-integ.line.games/api
+  _os: iOS
+  _nickName: lem
+  _nfGuid: 2911314858573069621

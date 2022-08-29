@@ -1,6 +1,7 @@
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using Network = Microsoft.VisualBasic.Devices.Network;
 
 [CreateAssetMenu(fileName ="NetworkConfig", menuName ="ScriptableObjects/NetworkConfig")]
 public class NetworkConfig : IScriptableObject
@@ -19,7 +20,7 @@ public class NetworkConfig : IScriptableObject
     
     [SerializeField] private string _os = "";
     public string OS => _os;
-    
+
     // todo
     [SerializeField] private string _nickName = "";
     public string NickName => _nickName;
@@ -61,5 +62,20 @@ public class NetworkConfigEditor : Editor
 
             Application.OpenURL("file://" + Script.FilePath);
         }
+
+
+        GUILayout.BeginHorizontal();
+
+        if (GUILayout.Button("Post Test"))
+        {
+            NetworkManager.Instance.Init();
+            
+            string response;
+            response = NetworkManager.Instance.DoLogin();
+            
+            DebugManager.Log($"response: {response}");
+        }
+        
+        GUILayout.EndHorizontal();
     }
 }
