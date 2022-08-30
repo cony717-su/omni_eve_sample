@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _gameCode: DC
   _binaryVersion: 0.41.14
-  _cryptKey: 25a03a9143fedb53dfaceae170b460e9
+  _cryptKey: 7d366d224bb130f333d59716c2760049
   _apiServer: http://dev-api-integ.line.games/api
   _os: iOS
   _nickName: lem
-  _nfGuid: 2911314858573069621
+  _nfGuid: 2242416212535562547

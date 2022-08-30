@@ -63,7 +63,7 @@ public class NetworkManager : IManager<NetworkManager>
         
         const string CRYPT_KEY = "25a03a9143fedb53dfaceae170b460e9";
         req.id = Crypt.EncryptWithBase64(Config.NfGuid, CRYPT_KEY);
-
+        
         string strReq = "";
         foreach (var fi in typeof(Request).GetFields())
         {
@@ -77,16 +77,17 @@ public class NetworkManager : IManager<NetworkManager>
         request.ContentLength = strReq.Length;
         request.UserAgent = "DestinyChildForKakao/";
 
-        DebugManager.Log($"{action}: {strReq}");
-        StreamWriter stream = new StreamWriter(request.GetRequestStream());
-        stream.Write(strReq);
-        stream.Close();
+        using(var stream = request.GetRequestStream())
+        {
+            stream.Write(strReq);
+            stream.Flush();
+            stream.Close();
+        }
 
-        
         HttpWebResponse response = (HttpWebResponse)request.GetResponse();
         StreamReader reader = new StreamReader(response.GetResponseStream());
-
-        return reader.ReadToEnd();
+        string strRes = reader.ReadToEnd();
+        return Crypt.DecodeBase64WithCrypt(strRes, CRYPT_KEY);
     }
 
 }
