@@ -11,6 +11,9 @@ public class NetworkConfig : IScriptableObject
 
     [SerializeField] private string _binaryVersion = "";
     public string BinaryVersion => _binaryVersion;
+    
+    [SerializeField] private string _clientVersion = "";
+    public string ClientVersion => _clientVersion;
 
     [SerializeField] private string _cryptKey = "";
     public string CryptKey => _cryptKey;
@@ -71,7 +74,7 @@ public class NetworkConfigEditor : Editor
             NetworkManager.Instance.Init();
             
             string response;
-            response = NetworkManager.Instance.DoLogin();
+            response = NetworkManager.Instance.getClientVersionInfo();
             
             DebugManager.Log($"response: {response}");
         }
