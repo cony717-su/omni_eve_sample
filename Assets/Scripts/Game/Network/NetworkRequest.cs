@@ -5,11 +5,9 @@ using System.Net;
 using System.Reflection;
 using System.Web;
 using Network;
-using Newtonsoft.Json;
 
 public class NetworkRequest
 {
-    int z;
     string act;
     string p;
     string os;
@@ -18,20 +16,34 @@ public class NetworkRequest
     string apiVersion;
     string appliedWhiteYn;
     string id;
-    
+
+    public string Id
+    {
+        set => id = value;
+    }
+    public string V
+    {
+        set => v = value;
+    }
+
     public static string GameCode => NetworkManager.Instance.Config.GameCode;
     public static string BinaryVersion => NetworkManager.Instance.Config.BinaryVersion;
-    public static string CryptKey => NetworkManager.Instance.Config.CryptKey;
     public static string ApiServer => NetworkManager.Instance.Config.ApiServer;
+    public static string GameServer => NetworkManager.Instance.Config.GameServer;
+    public static string CryptKey => NetworkManager.Instance.Config.CryptKey;
     public static string OS => NetworkManager.Instance.Config.OS;
     public static string NickName => NetworkManager.Instance.Config.NickName;
     public static string NfGuid => NetworkManager.Instance.Config.NfGuid;
 
-    public NetworkRequest(string action, string reqData)
+    public NetworkRequest(string action, string strReq = "")
     {
-        z = UnityEngine.Random.Range(0, 999999);
-        act = action; 
-        p = Crypt.EncryptWithBase64(reqData, CryptKey);
+        act = action;
+        id = Crypt.EncryptWithBase64(NfGuid, NetworkManager.CRYPT_KEY);
+
+        if (!string.IsNullOrEmpty(strReq))
+        {
+            SetRequestData(strReq);
+        }
         
         os = OS;
         reqKey = GetRegKey();
@@ -39,19 +51,33 @@ public class NetworkRequest
         apiVersion = BinaryVersion;
         appliedWhiteYn = "Y";
     }
-    
-    public string Request()
+
+    public void SetRequestData(string strReq, string cryptKey = "")
     {
-        const string CRYPT_KEY = "25a03a9143fedb53dfaceae170b460e9";
-        id = Crypt.EncryptWithBase64(NfGuid, CRYPT_KEY);
+        if (string.IsNullOrEmpty(cryptKey))
+            cryptKey = CryptKey;
         
-        string strRes = RequestWebUrl(GetRequestStreamData(), "http://kr.dc.dev.shiftup.co.kr/dev_lem/");
-        return Crypt.DecodeBase64WithCrypt(strRes, CRYPT_KEY);
+        // default added parameter
+        strReq = strReq.Replace("}", $"\"z\":{UnityEngine.Random.Range(0, 999999)}" + "}");
+        p = Crypt.EncryptWithBase64(strReq, cryptKey);
     }
 
-    public static string RequestWebUrl(string strReq, string reqWebUrl)
+    public string Request()
     {
-        DebugManager.Log($"{strReq}");
+        string strReq = GetRequestStreamData();
+        string strRes = Request(strReq, GameServer);
+        return Crypt.DecodeBase64WithCrypt(strRes, NetworkManager.CRYPT_KEY);
+    }
+
+    public static string Request(Dictionary<string, object> reqData, string reqWebUrl)
+    {
+        string strReq = GetRequestStreamData(reqData);
+        return Request(strReq, reqWebUrl);
+    }
+    
+    static string Request(string strReq, string reqWebUrl)
+    {
+        DebugManager.Log($"req: {strReq}");
         
         HttpWebRequest request = (HttpWebRequest)WebRequest.Create(reqWebUrl);
         request.Method = "POST";
@@ -65,10 +91,13 @@ public class NetworkRequest
 
         HttpWebResponse response = (HttpWebResponse)request.GetResponse();
         StreamReader reader = new StreamReader(response.GetResponseStream());
-        return reader.ReadToEnd();
+        
+        string strRes = reader.ReadToEnd(); 
+        DebugManager.Log($"res: {strRes}");
+        return strRes;
     }
 
-    public static string GetRequestStreamData(Dictionary<string, object> reqData)
+    static string GetRequestStreamData(Dictionary<string, object> reqData)
     {
         string strReq = "";
         foreach (var item in reqData)
@@ -77,14 +106,15 @@ public class NetworkRequest
         }
         return strReq.TrimEnd('&');
     }
+
     string GetRequestStreamData()
     {
-        string strReq = "";
+        Dictionary<string, object> reqData = new Dictionary<string, object>();
         foreach (var fi in typeof(NetworkRequest).GetFields(BindingFlags.NonPublic | BindingFlags.Instance))
         {
-            strReq += $"{fi.Name}=" + HttpUtility.UrlEncode(Convert.ToString(fi.GetValue(this))) + "&";
+            reqData.TryAdd(fi.Name, fi.GetValue(this));
         }
-        return strReq.TrimEnd('&');
+        return GetRequestStreamData(reqData);
     }
 
     string GetRegKey()

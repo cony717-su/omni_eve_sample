@@ -1,8 +1,12 @@
+using System;
 using System.Collections.Generic;
+using System.Web;
 using UnityEngine;
 
 public class NetworkManager : IManager<NetworkManager>
 {
+    public const string CRYPT_KEY = "25a03a9143fedb53dfaceae170b460e9";
+
     private NetworkConfig _config;
     public NetworkConfig Config => _config;
     
@@ -19,10 +23,22 @@ public class NetworkManager : IManager<NetworkManager>
         resData = JsonUtility.FromJson<TResponse>(jsonRes);
         return jsonRes;
     }
-
-    public string Request(string action, string jsonReqData)
+    
+    public string Request(string action, Dictionary<string, object> reqData)
     {
-        NetworkRequest req = new NetworkRequest(action, jsonReqData);
+        string jsonReqData = JsonUtility.ToJson(reqData);
+        return Request(action, jsonReqData);
+    }
+
+    public string Request(string action, string jsonReq)
+    {
+        NetworkRequest req = new NetworkRequest(action, jsonReq);
         return req.Request();
+    }
+
+    public string RequestApiServer(string action, Dictionary<string, object> reqData)
+    {
+        string reqWebUrl = Config.ApiServer + action;
+        return NetworkRequest.Request(reqData, reqWebUrl);
     }
 }

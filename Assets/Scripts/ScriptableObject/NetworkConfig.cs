@@ -1,4 +1,5 @@
 using System.IO;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 using Network = Microsoft.VisualBasic.Devices.Network;
@@ -21,9 +22,16 @@ public class NetworkConfig : IScriptableObject
     [SerializeField] private string _apiServer = "";
     public string ApiServer => _apiServer;
     
+    [SerializeField] private string _gameServer = "";
+    public string GameServer => _gameServer;
+    
     [SerializeField] private string _os = "";
     public string OS => _os;
 
+    // todo
+    [SerializeField] private string _action = "";
+    public string Action => _action;
+    
     // todo
     [SerializeField] private string _nickName = "";
     public string NickName => _nickName;
@@ -72,11 +80,7 @@ public class NetworkConfigEditor : Editor
         if (GUILayout.Button("Post Test"))
         {
             NetworkManager.Instance.Init();
-            
-            string response;
-            response = NetworkManager.Instance.getClientVersionInfo();
-            
-            DebugManager.Log($"response: {response}");
+            NetworkManager.Instance.DoLogicDataOph();
         }
         
         GUILayout.EndHorizontal();
