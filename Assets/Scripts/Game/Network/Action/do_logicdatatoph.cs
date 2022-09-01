@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 public static partial class NetworkManagerExtension
 {
     public static string DoLogicDataOph(this NetworkManager inst)

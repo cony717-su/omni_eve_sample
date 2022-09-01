@@ -1,15 +1,9 @@
-using System;
-using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace Network
 {
     public static class Crypt
     {
-        static string s_strResult1 = "";
-        static string s_strResult2 = "";
-
         /*------ Base64 Encoding Table ------*/
         static readonly char[] MimeBase64 = {
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
@@ -28,9 +22,6 @@ namespace Network
             {
                 return "";
             }
-            
-            s_strResult1 = c_szSrc;
-            s_strResult2 = "";
 
             byte[] encryption = Encoding.UTF8.GetBytes(c_szSrc);
             int keyLength = c_szKey.Length;
@@ -38,19 +29,18 @@ namespace Network
             {
                 encryption[i] = (byte)(c_szSrc[i] ^ c_szKey[i % keyLength]);
             }
-
-            base64_encode(encryption, c_szSrc.Length, out s_strResult2);
-            return s_strResult2;
+            
+            return base64_encode(encryption, c_szSrc.Length);
         }
 
-        private static int base64_encode(byte[] text, int numBytes, out string pEncodedText)
+        private static string base64_encode(byte[] text, int numBytes)
         {
             byte[] input = {0, 0, 0};
             byte[] output = {0, 0, 0, 0};
-
+            string encodedText = "";
+            
             int size = (4 * (numBytes / 3)) + (numBytes % 3 != 0 ? 4 : 0) + 1;
-
-            pEncodedText = "";
+            
             for (int i = 0; i < numBytes; i++)
             {
                 int index = i % 3;
@@ -63,15 +53,15 @@ namespace Network
                     output[2] = (byte)(((input[1] & 0xF) << 2) | ((input[2] & 0xC0) >> 6));
                     output[3] = (byte)(input[2] & 0x3F);
                     
-                    pEncodedText += MimeBase64[output[0]];
-                    pEncodedText += MimeBase64[output[1]];
-                    pEncodedText += index == 0? '=' : MimeBase64[output[2]];
-                    pEncodedText += index <  2? '=' : MimeBase64[output[3]];
+                    encodedText += MimeBase64[output[0]];
+                    encodedText += MimeBase64[output[1]];
+                    encodedText += index == 0? '=' : MimeBase64[output[2]];
+                    encodedText += index <  2? '=' : MimeBase64[output[3]];
                     
                     input[0] = input[1] = input[2] = 0;
                 }
             }
-            return size;
+            return encodedText;
         }
         
         /*------ Base64 Decoding Table ------*/
@@ -100,9 +90,6 @@ namespace Network
             {
                 return "";
             }
-            
-            s_strResult1 = "";
-            s_strResult2 = "";
 
             int size = c_szSrc.Length;
             byte[] description = null;
@@ -115,10 +102,7 @@ namespace Network
                 result[i] = (byte)(description[i] ^ c_szKey[i % keyLength]);
             }
 
-            s_strResult2 = Encoding.Default.GetString(result);
-
-            result[5] = (byte)'\0';
-            return s_strResult2;
+            return Encoding.Default.GetString(result);
         }
 
         static int base64_decode(char[] text, out byte[]dst, int numBytes)
