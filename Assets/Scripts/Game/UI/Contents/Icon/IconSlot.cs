@@ -7,7 +7,7 @@ public class IconSlot : MonoBehaviour
 {
     public void SetIconSlot(string iconName, string imgName)
     {
-        ResourcesManager.LoadAddressableAsset<Sprite>(imgName, result =>
+        ResourcesManager.Instance.LoadAddressableAsset<Sprite>(imgName, result =>
         {
 	        var image = result;
 	        GameObject iconObj = GameObject.Find(iconName + "/img_slot_value");
@@ -29,7 +29,7 @@ public class IconSlot : MonoBehaviour
     {
 	    string frameName = GetAttributeFrameName(attribute);
 	    
-	    ResourcesManager.LoadAddressableAsset<Sprite>(frameName, result =>
+	    ResourcesManager.Instance.LoadAddressableAsset<Sprite>(frameName, result =>
 	    {
 		    var image = result;
 		    GameObject iconObj = GameObject.Find(iconName + "/img_frame");
