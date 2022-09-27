@@ -6,6 +6,9 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 
+// handleDictionary는 유지하고
+// AddressableAssetSprite/AtlasLoader 형식으로 컴포넌트화 시켜서
+// 로딩이 필요한 곳에 넣어주고 핸들 생성과 제거를 해주면 좋을듯
 public class ResourcesManager : IManager<ResourcesManager>
 {
     private static Dictionary<string, AsyncOperationHandle> handleDictionary;
@@ -15,7 +18,7 @@ public class ResourcesManager : IManager<ResourcesManager>
         handleDictionary = new Dictionary<string, AsyncOperationHandle>();
     }
 
-    public static void LoadAddressableAsset<T>(string assetName, UnityAction<T> callback)
+    public void LoadAddressableAsset<T>(string assetName, UnityAction<T> callback)
     {
         Addressables.LoadAssetAsync<T>(assetName).Completed += obj =>
         {
@@ -25,28 +28,50 @@ public class ResourcesManager : IManager<ResourcesManager>
                 return;
             }
 
-            handleDictionary.Add(assetName, obj);
+            //handleDictionary.Add(assetName, obj);
             callback(obj.Result);
         };
     }
-    public static void OnDestroy(string objName)
+    public void Destroy(string objName)
     {
         if (!handleDictionary.ContainsKey(objName))
         {
             DebugManager.LogError($"Failed to destroy asset at address: {objName}");
             return;
         }
-
+    
         var handle = handleDictionary[objName];
         Addressables.Release(handle);
     }
 
-    public static void InstantiateAssetAsync(string assetName, Transform parent = null, 
+    public void InstantiateAssetAsync(string assetName, Transform parent = null, 
         bool instantiateInWorldSpace = false, bool trackHandle = true, 
         UnityAction<GameObject> callback = null)
     {
         Addressables.InstantiateAsync(assetName, parent, instantiateInWorldSpace, 
             trackHandle).Completed += (obj) =>
+        {
+            if (obj.Status != AsyncOperationStatus.Succeeded)
+            {
+                DebugManager.LogError($"Failed to instantiate asset at address: {assetName}");
+                return;
+            }
+
+            if (!handleDictionary.ContainsKey(assetName))
+            {
+                handleDictionary.Add(assetName, obj);
+            }
+
+            if (callback != null)
+            {
+                callback(obj.Result);
+            }
+        };
+    } 
+    public void InstantiateAssetAsync(string assetName, Transform parent = null,
+        UnityAction<GameObject> callback = null)
+    {
+        Addressables.InstantiateAsync(assetName, parent).Completed += (obj) =>
         {
             if (obj.Status != AsyncOperationStatus.Succeeded)
             {

@@ -5,7 +5,7 @@ using UnityEngine;
 public class Page : MonoBehaviour
 {
     protected Register register;
-    
+
     public enum VisibleState
     {
         Appearing,

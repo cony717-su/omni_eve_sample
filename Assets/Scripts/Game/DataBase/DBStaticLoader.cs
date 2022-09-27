@@ -155,6 +155,17 @@ public class DBStaticLoader : MonoBehaviour
         return serverName;
     }
 
+    public string GetBinPath()
+    {
+        string bin = _UserConfigData.bin;
+        if (string.IsNullOrEmpty(bin))
+        {
+            return "";
+        }
+
+        return bin;
+    }
+
     void LoadConfigFile()
     {
         string configDir = Application.dataPath + "\\config";

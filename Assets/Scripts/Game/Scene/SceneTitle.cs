@@ -16,5 +16,8 @@ public class SceneTitle : IScene
     {
         StaticManager.Instance.Load();
         LocaleManager.LoadLocale("locale");
+        LocaleManager.LoadLocaleByCSV("locale_character_name", "CHARACTER_NAME_", 1);
+        LocaleManager.LoadLocaleByCSV("locale_character_name", "CHARACTER_SKIN_DESCRIPTION_", 2);
+        
     }
 }

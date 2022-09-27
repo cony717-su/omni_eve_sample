@@ -22,24 +22,24 @@ public class ContentsIcon : IconSlot
 
     public void SetContentsIconCharacter(string iconName, ContentsObject contents)
     {
+        int idx = contents.ContentsIdx;
+        //var data = StaticManager.Instance.Get<StaticCharacterSkin>(idx);
+        //string viewIdx = data.view_idx;
+        
         string tempImg = "davi";
         SetIconSlot(iconName, tempImg);
         AttributeType tempAttribute = AttributeType.Light;
         SetIconFrameColor(iconName, tempAttribute);
     }
 
-    public void SetCharacterIcon()
-    {
-        
-    }
     public void SetContentsIconItem(string iconName, ContentsObject contents)
     {
+        int idx = contents.ContentsIdx;
+        //var data = StaticManager.Instance.Get<StaticItem>(idx);
+        //string viewIdx = data.view_idx;
+        
         string tempImg = "a107_01";
         SetIconSlot(iconName, tempImg);
     }
 
-    public void SetItemIcon()
-    {
-        
-    }
 }

@@ -22,7 +22,7 @@ public class PopupManager : IManager<PopupManager>
     
     public void Show(string popupName, params object[] obj)
     {
-        ResourcesManager.InstantiateAssetAsync(popupName, _parent,
+        ResourcesManager.Instance.InstantiateAssetAsync(popupName, _parent,
             true, true,
             (result) =>
             {
@@ -52,7 +52,7 @@ public class PopupManager : IManager<PopupManager>
     }
     private void AddPopup (string popupName)
     {
-        ResourcesManager.InstantiateAssetAsync(popupName, _parent,
+        ResourcesManager.Instance.InstantiateAssetAsync(popupName, _parent,
             true, true,
             (result) =>
             {
