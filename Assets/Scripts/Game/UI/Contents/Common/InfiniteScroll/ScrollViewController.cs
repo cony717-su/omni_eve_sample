@@ -230,15 +230,14 @@ public class ScrollViewController<T> : ViewController		// ViewController 클래�
 		
 		int constraintCount = GetContraintSlotCount();
 		int nextSlotDataIndex = lastSlot.DataIndex + 1;
-		Vector2 nextSlotTop = lastSlot.Top;
-		Vector2 nextSlotBottom = lastSlot.Bottom;
+		Vector2 nextSlotTop = lastSlot.Top + new Vector2(0.0f, -slotSize.y);
+		Vector2 nextSlotBottom = nextSlotTop + new Vector2(0.0f, -slotSize.y);
 
-		while(nextSlotDataIndex < fullSlot && 
+		while(slotList.Count < fullSlot && 
 		      nextSlotTop.y >= _visibleRect.y - _visibleRect.height)
 		{
 			if (nextSlotDataIndex % constraintCount == 0)
 			{
-				//nextSlotTop = lastSlot.Bottom + new Vector2(0.0f, -slotSize.y);
 				nextSlotTop = new Vector2(0.0f, nextSlotBottom.y);
 				nextSlotBottom = nextSlotTop + new Vector2(0.0f, -slotSize.y);
 			}
@@ -246,6 +245,22 @@ public class ScrollViewController<T> : ViewController		// ViewController 클래�
 			{
 				nextSlotTop += new Vector2(slotSize.x + spacingHeight, 0.0f);
 				nextSlotBottom = nextSlotTop - new Vector2(0.0f, slotSize.y);
+			}
+
+			// 마지막 줄일 경우 한줄은 따로 만들어준다
+			if (nextSlotTop.y < _visibleRect.y - _visibleRect.height)
+			{
+				for (int i = 0; i < constraintCount; ++i)
+				{
+					ScrollViewSlot<T> lastLineslot = CreateSlotForIndex(nextSlotDataIndex);
+					lastLineslot.Top = nextSlotTop;
+					lastLineslot.Bottom = nextSlotBottom;
+					
+					nextSlotTop += new Vector2(slotSize.x + spacingHeight, 0.0f);
+					nextSlotBottom = nextSlotTop - new Vector2(0.0f, slotSize.y);
+				}
+
+				return;
 			}
 			
 			ScrollViewSlot<T> slot = CreateSlotForIndex(nextSlotDataIndex);
@@ -267,6 +282,13 @@ public class ScrollViewController<T> : ViewController		// ViewController 클래�
 	{
 		// visibleRect를 갱신한다
 		UpdateVisibleRect();
+
+		// 맨 위에서 아래로 땡기는 경우 갱신하지 않는다
+		if (_visibleRect.y > 0)
+		{
+			return;
+		}
+		
         // 스크롤한 방향에 따라 셀을 다시 이용해 표시를 갱신한다
         ReuseSlots((scrollPos.y < _prevScrollPos.y)? 1: -1);
 
@@ -307,8 +329,6 @@ public class ScrollViewController<T> : ViewController		// ViewController 클래�
 					firstSlot = slotList.First.Value;
 
 					topX += slotSize.x + spacingHeight;
-					
-					Debug.Log("lastSlot DataIndex: " + lastSlot.DataIndex);
 				}
 			}
 
@@ -330,17 +350,13 @@ public class ScrollViewController<T> : ViewController		// ViewController 클래�
 				{
 					ScrollViewSlot<T> firstSlot = slotList.First.Value;
 					UpdateSlotForIndex(lastSlot, firstSlot.DataIndex - 1);
-					//lastSlot.Bottom = new Vector2(topX, firstSlot.Top.y + spacingHeight);
-					//lastSlot.Top = new Vector2(topX, firstSlot.Top.y);
-					lastSlot.Bottom = new Vector2(topX, firstSlot.Top.y);
+					lastSlot.Bottom = new Vector2(topX, firstSlot.Top.y - slotSize.y);
 
 					slotList.AddFirst(lastSlot);
 					slotList.RemoveLast();
 					lastSlot = slotList.Last.Value;
 
 					topX += slotSize.x + spacingHeight;
-					
-					Debug.Log("firstSlot DataIndex: " + firstSlot.DataIndex);
 				}
 			}
 		}

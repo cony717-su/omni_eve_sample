@@ -52,40 +52,6 @@ public class ListBoardInventory : ScrollViewController<InventorySlotData>
     {
         base.Start();
         LoadData();
-        
-        #region 아이템 목록 화면을 내비게이션 뷰에 대응시킨다
-        if(navigationView != null)
-        {
-            // 내비게이션 뷰의 첫 뷰로 설정한다
-            navigationView.Push(this);
-        }
-        #endregion
 
     }
-    
-    
-    #region 아이템 목록 화면을 내비게이션 뷰에 대응시킨다
-    // 내비게이션 뷰
-    [SerializeField] private NavigationViewController navigationView;
-
-    // 뷰의 타이틀을 반환한다
-    //public override string Title { get { return "SHOP"; } }
-    #endregion
-
-    #region 아이템 상세 화면으로 옮기는 처리
-    // 아이템 상세 화면의 뷰
-    //[SerializeField] private ShopDetailViewController detailView;
-
-    // 셀이 선택됐을 때 호출되는 메서드
-    public void OnPressCell(ShopItemTableViewCell cell)
-    {
-        if(navigationView != null)
-        {
-            // 선택된 셀로부터 아이템 데이터를 가져와서 아이템 상세 화면의 내용을 갱신한다
-            //detailView.UpdateContent(tableData[cell.DataIndex]);
-            // 아이템 상세 화면으로 옮긴다
-            //navigationView.Push(detailView);
-        }
-    }
-    #endregion
 }
