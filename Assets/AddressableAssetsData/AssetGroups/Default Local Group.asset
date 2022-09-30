@@ -25,10 +25,6 @@ MonoBehaviour:
     m_Address: SceneLobby
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: 421cf6f8d52ad2c4b97f37e5b11eaf1b
-    m_Address: SceneGame
-    m_ReadOnly: 0
-    m_SerializedLabels: []
   - m_GUID: 007075d92f1f30645bc3b44788803ccf
     m_Address: SceneLoader
     m_ReadOnly: 0

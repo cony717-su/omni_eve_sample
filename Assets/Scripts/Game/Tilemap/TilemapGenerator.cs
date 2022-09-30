@@ -82,6 +82,18 @@ public class TilemapGenerator : MonoBehaviour
             }
         }
 
+        public bool IsPlaceable()
+        {
+            switch (tileType)
+            {
+                case TileType.Floor:
+                    // must not place on tiles already occupied by something
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
         public int GetKey()
         {
             return position.x << 10 | position.y;
@@ -118,16 +130,31 @@ public class TilemapGenerator : MonoBehaviour
     // Start is called before the first frame update
     public void GenerateTilemap()
     {
-        _tilemapData = StaticManager.Instance.Get<StaticOmniEveFloor>(floorIndex);
+        // _tilemapData = StaticManager.Instance.Get<StaticOmniEveFloor>(floorIndex);
 
         if (IsDebugTest)
         {
             _tilemapData = new StaticOmniEveFloor();
-            _tilemapData.width = 32;
-            _tilemapData.height = 32;
-        
-            _tilemapData.room_width = 3;
-            _tilemapData.room_height = 3;
+            _tilemapData.idx = 1;
+            _tilemapData.width = 20;
+            _tilemapData.height = 20;
+            _tilemapData.room_width = 2;
+            _tilemapData.room_height = 2;
+            _tilemapData.treasure_count_min = 3;
+            _tilemapData.treasure_count_max = 3;
+            _tilemapData.treasure_trap_prob = 0;
+            _tilemapData.treasure_item_prob = 150;
+            _tilemapData.treasure_coin_prob = 150;
+            _tilemapData.treasure_trap_group_idx = 1;
+            _tilemapData.treasure_item_group_idx = 101;
+            _tilemapData.treasure_coin_group_idx = 1001;
+            _tilemapData.mob_count = 6;
+            _tilemapData.mob_group_idx = 1;
+            _tilemapData.forced_mob_group_idx = 0;
+            _tilemapData.shop_equip_count = 4;
+            _tilemapData.shop_group_idx = 201;
+            _tilemapData.stage_type = 0;
+
             Debug.Log($"Load MapData: {_tilemapData.width}, {_tilemapData.height}");            
         }
         
@@ -384,6 +411,59 @@ public class TilemapGenerator : MonoBehaviour
             }
         }
         // DebugManager.Log($"{src.idx} - {src.position.ToString()} = ({src.GetDirectionToRoom(dst)}) to {dst.idx} - {dst.position.ToString()} = ({dst.GetDirectionToRoom(src)})");
+    }
+
+    protected TileData OmniEveGetRandomTilePosition(bool isStairs)
+    {
+        TileData randomTile = new();
+        RectInt roomSize;
+        List<TileData> tileList = new();
+        List<RoomData> listRoomData = _listRoomData.OrderBy(a => Guid.NewGuid()).ToList().ConvertAll(x => new RoomData(x));
+
+        for (int i = 0; i < listRoomData.Count; i++)
+        {
+            tileList.Clear();
+            roomSize = listRoomData[i].tileSize;
+
+            for (int row = roomSize.xMin+1; row < roomSize.xMax; row++)
+            {
+                for (int col = roomSize.yMin+1; col < roomSize.yMax; col++)
+                {
+                    TileData t = OmniEveGetTileDatabyRowColumn(row, col);
+                    if (t.IsPlaceable())
+                    {
+                        tileList.Add(t);
+                    }
+                }
+            }
+
+            if (tileList.Count > 0)
+            {
+                if (isStairs)
+                {
+                    
+                }
+                break;
+            }
+        }
+
+        if (tileList.Count <= 0)
+        {
+            return randomTile;
+        }
+
+        int randomNum = Random.Range(1, tileList.Count);
+        randomTile = tileList[randomNum];
+        // DebugManager.Log($"OmniEveGetRandomTilePosition: {randomTile.position.ToString()}");
+
+        return randomTile;
+    }
+
+    protected TileData OmniEveGetTileDatabyRowColumn(int row, int col)
+    {
+        int key = TileData.GetKey(row, col);
+        TileData t = _dictTileData[key];
+        return t;
     }
 }
 
