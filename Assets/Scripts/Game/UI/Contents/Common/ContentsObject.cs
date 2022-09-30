@@ -14,4 +14,14 @@ public class ContentsObject
         ContentsIdx = idx;
         ConstnetsCount = count;
     }
+
+    public bool IsCharacter()
+    {
+        return ContentsType == ContentsObjectType.Character;
+    }
+
+    public bool IsItem()
+    {
+        return ContentsType == ContentsObjectType.Item;
+    }
 }

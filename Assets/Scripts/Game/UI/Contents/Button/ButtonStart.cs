@@ -20,5 +20,6 @@ public class ButtonStart : UIBase
     public void OnClickRegister()
     {
         Debug.Log("Registered OnClick()");
+        var a = StaticManager.Instance.Get<StaticItem>(1010021);
     }
 }

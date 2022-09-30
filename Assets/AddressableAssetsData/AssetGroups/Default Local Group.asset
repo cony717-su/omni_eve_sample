@@ -101,6 +101,14 @@ MonoBehaviour:
     m_Address: ele_slot_frame_white
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 10b0e14d03c034e409af8da04a5fd4d2
+    m_Address: ListBoardSlot
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 5b3e6a703b1517643b6176ecea6afd41
+    m_Address: locale_character_name
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 8e2cd4983dffac84ebf8357c0ce5089d, type: 2}
   m_SchemaSet:

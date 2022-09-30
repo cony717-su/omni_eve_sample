@@ -8,23 +8,23 @@ using Util;
 
 public class LocaleManager: IManager<GameManager>
 {
-    private static Dictionary<string, string> LocaleDictionary { set; get; }
+    private static Dictionary<string, string> _LocaleDictionary { set; get; }
 
     public static string GetLocale(string key)
     {
-        if (!LocaleDictionary.ContainsKey(key))
+        if (!_LocaleDictionary.ContainsKey(key))
         {
             DebugManager.Log($"Invalid GetLocaleText key: {key}");
             return key;
         }
 
-        return LocaleDictionary[key];
+        return _LocaleDictionary[key];
     }
     public static void LoadLocale(string fileName)
     {
-        LocaleDictionary = new Dictionary<string, string>();
+        _LocaleDictionary = new Dictionary<string, string>();
         
-        ResourcesManager.LoadAddressableAsset<TextAsset>(fileName, (result) =>
+        ResourcesManager.Instance.LoadAddressableAsset<TextAsset>(fileName, (result) =>
         {
             var locales = result.text;
 
@@ -46,14 +46,14 @@ public class LocaleManager: IManager<GameManager>
 
                 Pair<string, string> textPair = Util.Util.SplitTextLineByKeyAndValue(strLine);
 
-                if (LocaleDictionary.ContainsKey(textPair.First))
+                if (_LocaleDictionary.ContainsKey(textPair.First))
                 {
                     DebugManager.Log($"Already exist in LocaleDictionary: {textPair.First}");
                     strLine = "";
                     continue;
                 }
                 
-                LocaleDictionary.Add(textPair.First, textPair.Second);
+                _LocaleDictionary.Add(textPair.First, textPair.Second);
                 strLine = "";
             }
         });
@@ -62,7 +62,7 @@ public class LocaleManager: IManager<GameManager>
 
     public static void LoadLocaleByCSV(string fileName, string prefix, int index)
     {
-        ResourcesManager.LoadAddressableAsset<TextAsset>(fileName, (result) =>
+        ResourcesManager.Instance.LoadAddressableAsset<TextAsset>(fileName, (result) =>
         {
             var locales = result.text;
 
@@ -97,7 +97,7 @@ public class LocaleManager: IManager<GameManager>
                 }
 
                 string strKey = prefix + textList[0];
-                if (LocaleDictionary.ContainsKey(strKey))
+                if (_LocaleDictionary.ContainsKey(strKey))
                 {
                     DebugManager.Log($"Already exist in LocaleDictionary: {strKey}");
                     strLine = "";
@@ -115,7 +115,7 @@ public class LocaleManager: IManager<GameManager>
                     strValue = textListElement;
                 }
                 
-                LocaleDictionary.Add(strKey, strValue);
+                _LocaleDictionary.Add(strKey, strValue);
                 strLine = "";
             }
         });

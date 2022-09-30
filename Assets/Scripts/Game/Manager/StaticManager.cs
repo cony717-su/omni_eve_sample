@@ -45,4 +45,9 @@ public class StaticManager : IManager<StaticManager>
         }
         return table.Get<T>(args);
     }
+
+    public string GetBinPath()
+    {
+        return _StaticLoader.GetBinPath();
+    }
 }
