@@ -87,7 +87,6 @@ public class TilemapGenerator : MonoBehaviour
             switch (tileType)
             {
                 case TileType.Floor:
-                    // must not place on tiles already occupied by something
                     return true;
                 default:
                     return false;
@@ -124,11 +123,16 @@ public class TilemapGenerator : MonoBehaviour
 
     public int floorIndex = 24;
 
-    [SerializeField] private bool IsDebugTest = false;
-    [SerializeField] private bool IsDebugClear = false;
+    private LevelManager _levelManager;
+
+    private void Start()
+    {
+        _tilemap = GetComponent<Tilemap>();
+        _tilemap.tag = "Tilemap";
+    }
 
     // Start is called before the first frame update
-    public void GenerateTilemap()
+    public Dictionary<int, TileData> GenerateTilemap(bool IsDebugTest, bool IsDebugClear)
     {
         // _tilemapData = StaticManager.Instance.Get<StaticOmniEveFloor>(floorIndex);
 
@@ -157,17 +161,19 @@ public class TilemapGenerator : MonoBehaviour
 
             Debug.Log($"Load MapData: {_tilemapData.width}, {_tilemapData.height}");            
         }
-        
-        _tilemap = GetComponent<Tilemap>();
+
         _tilemap.ClearAllTiles();
+        _tilemap.transform.position = new Vector3(0, 0, 0);
         _dictTileData.Clear();
 
         if (IsDebugClear)
         {
-            return;
+            return new();
         }
         GenerateRooms();
         GeneratePassages();
+
+        return _dictTileData;
     }
 
     protected bool OmniEveIsNormalStageFloor(int floor)
@@ -280,7 +286,7 @@ public class TilemapGenerator : MonoBehaviour
             case TileData.TileType.Wall:
                 ruleTile = tileWall;
                 break;
-            case TileData.TileType.Passage:
+            case TileData.TileType.Stair:
                 ruleTile = tileBase;
                 break;
             default:
@@ -300,7 +306,8 @@ public class TilemapGenerator : MonoBehaviour
             }
         }
 
-        _dictTileData.TryAdd(data.GetKey(), data);
+        // _dictTileData.TryAdd(data.GetKey(), data);
+        _dictTileData[data.GetKey()] = data;
         _tilemap.SetTile(data.position, ruleTile);
     }
 
@@ -401,7 +408,7 @@ public class TilemapGenerator : MonoBehaviour
                 }
             }
             
-            if (position.y != dstPosition.y && position.x >= (dstPosition.x - srcPosition.x) * 0.5)
+            if (position.y != dstPosition.y && position.x >= srcPosition.x + (dstPosition.x - srcPosition.x) * 0.5)
             {
                 position.y += dirY;
             }
@@ -413,7 +420,7 @@ public class TilemapGenerator : MonoBehaviour
         // DebugManager.Log($"{src.idx} - {src.position.ToString()} = ({src.GetDirectionToRoom(dst)}) to {dst.idx} - {dst.position.ToString()} = ({dst.GetDirectionToRoom(src)})");
     }
 
-    protected TileData OmniEveGetRandomTilePosition(bool isStairs)
+    public TileData OmniEveGetRandomTile(bool isStairs)
     {
         TileData randomTile = new();
         RectInt roomSize;
@@ -454,37 +461,20 @@ public class TilemapGenerator : MonoBehaviour
 
         int randomNum = Random.Range(1, tileList.Count);
         randomTile = tileList[randomNum];
-        // DebugManager.Log($"OmniEveGetRandomTilePosition: {randomTile.position.ToString()}");
+        // DebugManager.Log($"OmniEveGetRandomTilePosition: {randomTile.position}");
 
         return randomTile;
     }
 
-    protected TileData OmniEveGetTileDatabyRowColumn(int row, int col)
+    public void OmniEveSetStairs(TileData stairTile)
+    {
+        SetTile(stairTile.position.x, stairTile.position.y, TileData.TileType.Stair);
+    }
+
+    public TileData OmniEveGetTileDatabyRowColumn(int row, int col)
     {
         int key = TileData.GetKey(row, col);
         TileData t = _dictTileData[key];
         return t;
-    }
-}
-
-[CustomEditor(typeof(TilemapGenerator))]
-public class TilemapGeneratorEditor : Editor
-{
-    private TilemapGenerator generator;
-
-    private void OnEnable()
-    {
-        generator = FindObjectOfType<TilemapGenerator>();
-    }
-
-    public override void OnInspectorGUI()
-    {
-        DrawDefaultInspector();
-
-        if (GUILayout.Button("Generate Tilemap"))
-        {
-            // generate
-            generator.GenerateTilemap();
-        }
     }
 }
