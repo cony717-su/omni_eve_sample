@@ -17,6 +17,14 @@ public class CharacterManager : IManager<CharacterManager>
     private int scorePerCoinCount;
     private int scorePerPotionCount;
 
+    private enum Direction
+    {
+        Up,
+        Down,
+        Left,
+        Right
+    }
+
     MonsterManager monsterManager;
 
     public class Player : Character
@@ -49,6 +57,8 @@ public class CharacterManager : IManager<CharacterManager>
         public int trap { get; set; }
 
         public bool isClear { get; set; }
+
+        public Direction direction { get; set; }
 
         public void OmniEveSetStatLevelUpValueByType(StatType type, int newValue)
         {
@@ -182,6 +192,8 @@ public class CharacterManager : IManager<CharacterManager>
         player.inventoryList = new();
         player.inventoryCount = 0;
         player.lastItemUid = 0;
+
+        player.direction = Character.Direction.Right;
 
         player.isClear = false;
     }

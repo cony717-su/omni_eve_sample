@@ -16,7 +16,7 @@ public class MonsterManager : IManager<MonsterManager>
     LevelManager levelManager;
     TilemapGenerator tilemapGenerator;
 
-    public class Monster : Character
+    public class Monster : IScriptableObject
     {
         public int id { get; set; }
         public int groupIdx { get; set; }
@@ -34,6 +34,7 @@ public class MonsterManager : IManager<MonsterManager>
         {
             _mobData = StaticManager.Instance.Get<StaticOmniEveMob>(idx);
             this.idx = idx;
+            
         }
 
         public bool OmniEveIsCharacterInSight()

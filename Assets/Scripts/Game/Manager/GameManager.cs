@@ -6,6 +6,8 @@ using UniRx;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.SceneManagement;
+using UnityEditor;
+using Direction = CharacterManager.Player.Direction;
 
 public class GameManager : IManager<GameManager>
 {
@@ -13,9 +15,13 @@ public class GameManager : IManager<GameManager>
     public string nickName;
 
     private Transform _tilemapTransform;
-    public TilemapGenerator _tilemapGenerator;
+    private TilemapGenerator _tilemapGenerator;
     private CharacterManager _characterManager;
-    
+    private LevelManager _levelManager;
+
+    [SerializeField] private bool IsDebugTest = false;
+    [SerializeField] private bool IsDebugClear = false;
+
     void Start()
     {
         InitScene();
@@ -26,6 +32,7 @@ public class GameManager : IManager<GameManager>
         StaticManager.Instance.Init();
         DebugManager.Log();
         _characterManager = gameObject.GetComponent<CharacterManager>();
+        _levelManager = gameObject.GetComponent<LevelManager>();
     }
     
     void InitScene()
@@ -47,17 +54,11 @@ public class GameManager : IManager<GameManager>
 
     private void Update()
     {
-        //if (getTilemapTransform() && getTilemapGenerator())
-        //{
-        //    if (!_tilemapGenerator.isSpawned)
-        //    {
-        //        TilemapGenerator.TileData spawnTile = _tilemapGenerator.OmniEveGetRandomTile(false);
-        //        _tilemapGenerator.OmniEveSetTilemapTilePosition(spawnTile);
-        //        _characterManager.OmniEveSetCharacterTilePosition(spawnTile.position);
-        //        _tilemapGenerator.isSpawned = true;
-        //    }
-        //    OnOmniEvePressButton();
-        //}
+        if (Input.anyKeyDown)
+        {
+            OnOmniEvePressButton();
+        }
+        
     }
 
     private bool getTilemapTransform()
@@ -80,50 +81,94 @@ public class GameManager : IManager<GameManager>
         return true;
     }
 
+    public void OmniEveGenerateFloor()
+    {
+        _levelManager.GenerateTilemap(IsDebugTest, IsDebugClear);
+        OmniEveSetCharacterTileRandomPosition();
+    }
+
+    private void OmniEveSetCharacterTile(Vector3Int position)
+    {
+        getTilemapTransform();
+        _tilemapTransform.position = new Vector3Int(4, 10, 0) - position;
+    }
+
+    private void OmniEveMoveCharacter(Vector3Int curPosition, Direction direction)
+    {
+        Vector3Int shift;
+        switch (direction)
+        {
+            case Direction.Up:
+                shift = new Vector3Int(0, 1, 0);
+                break;
+            case Direction.Down:
+                shift = new Vector3Int(0, -1, 0);
+                break;
+            case Direction.Left:
+                shift = new Vector3Int(-1, 0, 0);
+                break;
+            case Direction.Right:
+                shift = new Vector3Int(1, 0, 0);
+                break;
+            default:
+                return;
+        }
+
+        Vector3Int nextPosition = curPosition + shift;
+        if (_characterManager.OmniEveIsMovable(nextPosition, _tilemapGenerator))
+        {
+            _tilemapTransform.position += new Vector3(0, -1, 0);
+            _characterManager.OmniEveSetCharacterTilePosition(nextPosition);
+            OmniEveSetCharacterTile(nextPosition);
+        }
+    }
+
     private void OnOmniEvePressButton()
     {
+        Vector3Int curPosition = _characterManager.OmniEveGetCharacterTilePosition();
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            Vector3Int curPosition = _characterManager.player.tilePosition;
-            Vector3Int nextPosition = curPosition + new Vector3Int(0, 1, 0);
-            if (_characterManager.OmniEveIsMovable(nextPosition, _tilemapGenerator))
-            {
-                _tilemapTransform.position += new Vector3(0, -1, 0);
-                _characterManager.OmniEveSetCharacterTilePosition(nextPosition);
-            }
+            OmniEveMoveCharacter(curPosition, Direction.Up);
         } else if (Input.GetKeyDown(KeyCode.DownArrow))
         {
-            Vector3Int curPosition = _characterManager.player.tilePosition;
-            Vector3Int nextPosition = curPosition + new Vector3Int(0, -1, 0);
-            if (_characterManager.OmniEveIsMovable(nextPosition, _tilemapGenerator))
-            {
-                _tilemapTransform.position += new Vector3(0, 1, 0);
-                _characterManager.OmniEveSetCharacterTilePosition(nextPosition);
-            }
+            OmniEveMoveCharacter(curPosition, Direction.Down);
         } else if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            Vector3Int curPosition = _characterManager.player.tilePosition;
-            Vector3Int nextPosition = curPosition + new Vector3Int(-1, 0, 0);
-            if (_characterManager.OmniEveIsMovable(nextPosition, _tilemapGenerator))
-            {
-                _tilemapTransform.position += new Vector3(1, 0, 0);
-                _characterManager.OmniEveSetCharacterTilePosition(nextPosition);
-            }
+            OmniEveMoveCharacter(curPosition, Direction.Left);
         } else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            Vector3Int curPosition = _characterManager.player.tilePosition;
-            Vector3Int nextPosition = curPosition + new Vector3Int(1, 0, 0);
-            if (_characterManager.OmniEveIsMovable(nextPosition, _tilemapGenerator))
-            {
-                _tilemapTransform.position += new Vector3(-1, 0, 0);
-                _characterManager.OmniEveSetCharacterTilePosition(nextPosition);
-            }
+            OmniEveMoveCharacter(curPosition, Direction.Right);
         }
     }
 
     protected void OmniEveSetCharacterTileRandomPosition()
     {
+        getTilemapGenerator();
+
         TilemapGenerator.TileData tilePos = _tilemapGenerator.OmniEveGetRandomTile(false);
         _characterManager.OmniEveSetCharacterTilePosition(tilePos.position);
+        OmniEveSetCharacterTile(tilePos.position);
+    }
+}
+
+[CustomEditor(typeof(GameManager))]
+public class TilemapGeneratorEditor : Editor
+{
+    private GameManager gameManager;
+
+    private void OnEnable()
+    {
+        gameManager = FindObjectOfType<GameManager>();
+    }
+
+    public override void OnInspectorGUI()
+    {
+        DrawDefaultInspector();
+
+        if (GUILayout.Button("Generate Tilemap"))
+        {
+            // generate
+            gameManager.OmniEveGenerateFloor();
+        }
     }
 }
